@@ -6,7 +6,7 @@ from service import BaseService
 from slogging import get_logger
 import utils
 import crypto
-from utils import decode_hex, parse_arguments, get_local_ip
+from utils import decode_hex, parse_arguments, get_local_ip, str_to_bytes
 
 __version__ = "0.0.1"
 
@@ -15,7 +15,8 @@ log = get_logger("app")
 
 class BaseApp(object):
     default_config = dict(
-        client_version_string="pydevp2p {}".format(__version__), deactivated_services=[]
+        client_version_string=str_to_bytes("pydevp2p {}".format(__version__)),
+        deactivated_services=[],
     )
 
     def __init__(self, config=default_config):
@@ -85,7 +86,7 @@ discovery:
     listen_host: {args.host if args.host else get_local_ip()}
     listen_port: {args.port if args.port else "30303"}
 node:
-    privkey_hex: 65462b0520ef7d3df61b9992ed3bea0c56ead753be7c8b3614e0ce01e4cac41b
+    privkey_hex: 876dd25bdbc50845afcc85dd899c46f7810b5920da75a92d1184dc540b66c74c
 p2p:
     min_peers: 5
     max_peers: 10

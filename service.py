@@ -70,11 +70,11 @@ class WiredService(BaseService):
     wire_protocol = None
 
     def on_wire_protocol_start(self, proto):
-        from .protocol import BaseProtocol
+        from protocol import BaseProtocol
 
         assert isinstance(proto, BaseProtocol)
 
     def on_wire_protocol_stop(self, proto):
-        from .protocol import BaseProtocol
+        from protocol import BaseProtocol
 
         assert isinstance(proto, BaseProtocol)

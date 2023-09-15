@@ -72,6 +72,7 @@ def host_port_pubkey_from_uri(uri):
 
 def host_port_pubkey_to_uri(host, port, pubkey):
     assert len(pubkey) == 512 // 8
+    print(pubkey)
     uri = str_to_bytes(
         "{}{}".format(
             node_uri_scheme,

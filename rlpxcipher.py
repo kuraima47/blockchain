@@ -182,6 +182,7 @@ class RLPxSession(object):
             S(ephemeral-privk, token ^ nonce) || H(ephemeral-pubk) || pubk || nonce || 0x1)
         """
         assert self.is_initiator
+        print(remote_pubkey)
         if not self.ecc.is_valid_key(remote_pubkey):
             raise InvalidKeyError("invalid remote pubkey")
         self.remote_pubkey = remote_pubkey
