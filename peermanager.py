@@ -183,8 +183,10 @@ class PeerManager(WiredService):
         return True
 
     def _bootstrap(self, bootstrap_nodes=[]):
-        if bootstrap_nodes:
+        if not isinstance(bootstrap_nodes, list):bootstrap_nodes = [bootstrap_nodes]
+        if bootstrap_nodes and bootstrap_nodes[0]:
             for uri in bootstrap_nodes:
+                print(uri)
                 ip, port, pubkey = utils.host_port_pubkey_from_uri(uri)
                 log.info("connecting bootstrap server", uri=uri)
                 try:
