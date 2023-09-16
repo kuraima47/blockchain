@@ -29,12 +29,12 @@ def bytes_to_str(b) -> str:
         raise TypeError(f"Non géré : {type(b)}")
 
 
-def safe_ord(c: str) -> int:
-    return ord(c) if isinstance(c, str) else c
+def safe_ord(value):
+    return value if isinstance(value, int) else ord(value)
 
 
-def ascii_chr(i: int) -> str:
-    return chr(i)
+def ascii_chr(i: int) -> bytes:
+    return bytes([i])
 
 
 ienc = int_to_big_endian = rlp.sedes.big_endian_int.serialize

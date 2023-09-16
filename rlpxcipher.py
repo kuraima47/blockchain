@@ -182,7 +182,6 @@ class RLPxSession(object):
             S(ephemeral-privk, token ^ nonce) || H(ephemeral-pubk) || pubk || nonce || 0x1)
         """
         assert self.is_initiator
-        print(remote_pubkey)
         if not self.ecc.is_valid_key(remote_pubkey):
             raise InvalidKeyError("invalid remote pubkey")
         self.remote_pubkey = remote_pubkey
@@ -192,7 +191,6 @@ class RLPxSession(object):
         flag = 0x0
         self.initiator_nonce = nonce or sha3(ienc(random.randint(0, 2**256 - 1)))
         assert len(self.initiator_nonce) == 32
-
         token_xor_nonce = sxor(token, self.initiator_nonce)
         assert len(token_xor_nonce) == 32
 
@@ -213,6 +211,7 @@ class RLPxSession(object):
             + self.initiator_nonce
             + ascii_chr(flag)
         )
+        nonce = auth_message[65 + 32 + 64 : 65 + 32 + 64 + 32]
         assert len(auth_message) == 65 + 32 + 64 + 32 + 1 == 194
         return auth_message
 

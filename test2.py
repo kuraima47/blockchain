@@ -1,6 +1,4 @@
-def a(x, c):
-    return x**c
+from utils import ascii_chr
 
-
-result = a(12, 4)
-print(result * 5)
+print(ascii_chr(0x0))
+print(0x0)

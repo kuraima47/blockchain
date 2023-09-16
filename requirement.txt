@@ -1,0 +1,12 @@
+argparse
+bitcoin
+coincurve
+cryptography
+pycryptodome
+gevent
+pyopenssl
+pyelliptic==1.5.7
+pyyaml
+repoze.lru
+upnpy
+rlp

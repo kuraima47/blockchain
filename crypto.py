@@ -2,7 +2,9 @@ CIPHERNAMES = set(("aes-128-ctr",))
 import warnings
 import os
 import sys
+import ctypes
 
+ctypes.windll.LoadLibrary("C:\\Program Files\\OpenSSL-Win64\\libeay32.dll")
 if sys.platform not in ("darwin",):
     import pyelliptic
 else:
