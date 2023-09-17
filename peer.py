@@ -109,7 +109,7 @@ class Peer(gevent.Greenlet):
         protocol = protocol_class(self, service)
         # register protocol
         assert protocol_class not in self.protocols
-        log.debug("registering protocol", protocol=protocol.name, peer=self)
+        log.debug("registering protocol", protocol=protocol.name, protocol_class=protocol_class, peer=self)
         self.protocols[protocol_class] = protocol
         self.mux.add_protocol(protocol.protocol_id)
         protocol.start()
@@ -309,7 +309,12 @@ class Peer(gevent.Greenlet):
             try:
                 imsg = self.connection.recv(4096)
             except gevent.socket.error as e:
-                log.debug("read error", errno=e.errno, reason=e.strerror, peer=self)
+                log.debug(
+                    "read error",
+                    errno=e.errno,
+                    reason=e.strerror,
+                    peer=self,
+                )
                 self.report_error("network error %s" % e.strerror)
                 if e.errno in (
                     errno.ENETDOWN,
@@ -321,6 +326,11 @@ class Peer(gevent.Greenlet):
                     # (Network down, Connection reset by peer, timeout, no route to host,
                     # Software caused connection abort (windows weirdness))
                     self.stop()
+                elif not e.errno:
+                    self.peermanager.app.services.discovery.protocol.kademlia.recv_retry_ask(
+                        self.connection.getpeername()
+                    )
+                    continue
                 else:
                     raise e
                     break

@@ -326,6 +326,8 @@ class WireInterface(object):
     def send_neighbours(self, node, neigbours):
         pass
 
+    def send_retry_instructions(self, node):
+        pass
 
 class FindNodeTask(object):
 
@@ -585,6 +587,12 @@ class KademliaProtocol(object):
             self._query_neighbours(targetid)
         # FIXME, should we return the closest node (allow callbacks on find_request)
 
+    def recv_retry_ask(self, address):
+        log.debug(
+            ">>> recv_retry_ask at", address=address
+        )
+        self.wire.send_retry_instructions(address)
+
     def recv_neighbours(self, remote, neighbours):
         """
         if one of the neighbours is closer than the closest known neighbour
@@ -609,10 +617,12 @@ class KademliaProtocol(object):
             closest = sorted(
                 neighbours, key=operator.methodcaller("id_distance", nodeid)
             )
+            log.debug("testRecvNeighbours")
             if time.time() < timeout:
                 closest_known = self.routing.neighbours(nodeid)
                 closest_known = closest_known[0] if closest_known else None
                 assert closest_known != self.this_node
+                log.debug("IftestRecvNeighbours")
                 # send find_node requests to k_find_concurrency closests
                 for close_node in closest[:k_find_concurrency]:
                     if not closest_known or close_node.id_distance(
@@ -623,6 +633,7 @@ class KademliaProtocol(object):
                             closest=close_node,
                             closest_known=closest_known,
                         )
+                        log.debug("send_find_node")
                         self.wire.send_find_node(close_node, nodeid)
 
         # add all nodes to the list

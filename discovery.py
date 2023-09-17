@@ -208,7 +208,8 @@ class DiscoveryProtocol(kademlia.WireInterface):
     expiration = 60  # let messages expire after N secondes
     cmd_id_map = dict(ping=1, pong=2, find_node=3, neighbours=4)
     rev_cmd_id_map = dict((v, k) for k, v in cmd_id_map.items())
-
+    last_cmd_id = 0
+    last_instruction = 0
     # number of required top-level list elements for each cmd_id.
     # elements beyond this length are trimmed.
     cmd_elem_count_map = dict(ping=4, pong=3, find_node=2, neighbours=2)
@@ -245,6 +246,16 @@ class DiscoveryProtocol(kademlia.WireInterface):
             node.address = address
         assert node.address
         return node
+
+    def get_node_by_address(self, address):
+        assert isinstance(address, Address)
+        tempnode = None
+        print(self.nodes)
+        for node in [val for pos, val in self.nodes.data.values()]:
+            if node.address == address:
+                tempnode = node
+
+        return tempnode
 
     def sign(self, msg):
         """
@@ -394,6 +405,8 @@ class DiscoveryProtocol(kademlia.WireInterface):
             node.address.to_endpoint(),
         ]
         assert len(payload) == 3
+        self.last_cmd_id = self.cmd_id_map["ping"]
+        self.last_instruction = payload
         message = self.pack(self.cmd_id_map["ping"], payload)
         self.send(node, message)
         return message[:32]  # return the MDC to identify pongs
@@ -430,6 +443,8 @@ class DiscoveryProtocol(kademlia.WireInterface):
         log.debug(">>> pong", remoteid=node)
         payload = [node.address.to_endpoint(), token]
         assert len(payload[0][0]) in (4, 16), payload
+        self.last_cmd_id = self.cmd_id_map["pong"]
+        self.last_instruction = payload
         message = self.pack(self.cmd_id_map["pong"], payload)
         self.send(node, message)
 
@@ -469,6 +484,8 @@ class DiscoveryProtocol(kademlia.WireInterface):
         )
         assert len(target_node_id) == kademlia.k_pubkey_size // 8
         log.debug(">>> find_node", remoteid=node)
+        self.last_cmd_id = self.cmd_id_map["find_node"]
+        self.last_instruction = [target_node_id]
         message = self.pack(self.cmd_id_map["find_node"], [target_node_id])
         self.send(node, message)
 
@@ -513,7 +530,20 @@ class DiscoveryProtocol(kademlia.WireInterface):
             neighbours=neighbours,
         )
         # FIXME: don't brake udp packet size / chunk message / also when receiving
+        self.last_cmd_id = self.cmd_id_map["neighbours"]
+        self.last_instruction = [nodes[:12]]
         message = self.pack(self.cmd_id_map["neighbours"], [nodes[:12]])  # FIXME
+        self.send(node, message)
+
+    def send_retry_instructions(self, address):
+        """
+        ### Retry (type 0x05)
+        """
+        if not isinstance(address, Address):
+            address = Address(ip=address[0], udp_port=address[1])
+        node = self.get_node_by_address(address)
+        log.debug(">>> retry_instructions", remoteid=node)
+        message = self.pack(self.last_cmd_id, self.last_instruction)
         self.send(node, message)
 
     def recv_neighbours(self, nodeid, payload, mdc):
