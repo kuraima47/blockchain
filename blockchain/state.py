@@ -37,27 +37,27 @@ class State(rlp.Serializable):
 
     def add_account(self, account):
         if account in self.accounts:
-            raise ValueError(f"Account {account} already exists")
+            raise ValueError(f"Account {account.hash} already exists")
         self.accounts.append(account)
 
     def add_eoa_account(self, account):
         if account in self.accounts:
-            raise ValueError(f"Account {account} already exists")
+            raise ValueError(f"Account {account.hash} already exists")
         self.eoa_accounts.append(account)
 
     def add_contract_account(self, contract):
         if contract in self.contract_accounts:
-            raise ValueError(f"Contract {contract} already exists")
+            raise ValueError(f"Contract {contract.hash} already exists")
         self.contract_accounts.append(contract)
 
     def add_contract_storage(self, storage):
         if storage in self.contract_storage:
-            raise ValueError(f"Storage {storage} already exists")
+            raise ValueError(f"Storage {storage.hash} already exists")
         self.contract_storage.append(storage)
 
     def add_tx_pool(self, tx):
         if tx in self.tx_pool:
-            raise ValueError(f"Transaction {tx} already exists")
+            raise ValueError(f"Transaction {tx.hash} already exists")
         self.tx_pool.append(tx)
 
     def add_block(self, block):
@@ -65,7 +65,7 @@ class State(rlp.Serializable):
 
     def remove_tx_pool(self, tx):
         if tx not in self.tx_pool:
-            raise ValueError(f"Transaction {tx} does not exist")
+            raise ValueError(f"Transaction {tx.hash} does not exist")
         self.tx_pool.remove(tx)
 
     def transfer(self, sender, receiver, amount):
