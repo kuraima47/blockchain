@@ -23,6 +23,7 @@ class Transaction(rlp.Serializable):
 
     @property
     def hash(self):
+        print(rlp.encode(self))
         return utils.sha3(rlp.encode(self))
 
     @property

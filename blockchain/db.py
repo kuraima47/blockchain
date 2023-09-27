@@ -6,7 +6,8 @@ import utils
 class Db:
 
     def __init__(self, filename, recover=False):
-        self.conn, self.c = None, None
+        self.conn = sqlite3.connect(filename)
+        self.c = self.conn.cursor()
         self.tables = [
             {
                 "name": "eoa_accounts",
@@ -58,24 +59,31 @@ class Db:
                     ("s", "INTEGER"),
                 ],
             },
+            {
+                "name": "transaction",
+                "fields": [
+                    ("hash", "TEXT"),
+                    ("nonce", "INTEGER"),
+                    ("gas_price", "INTEGER"),
+                    ("gas", "INTEGER"),
+                    ("from", "TEXT"),
+                    ("to", "TEXT"),
+                    ("value", "INTEGER"),
+                    ("data", "TEXT"),
+                    ("v", "INTEGER"),
+                    ("r", "INTEGER"),
+                    ("s", "INTEGER"),
+                    ("block", "INTEGER"),
+                    ("used_gas", "INTEGER"),
+                ]
+            }
         ]
         self.filename = filename
-        if recover:
-            self.load()
-        else:
-            self.init_db()
 
-    def load(self):
-        if os.path.exists(self.filename):
-            with open(self.filename, "rb") as f:
-                # load the db from the file
-                pass
-        else:
+        if not recover:
             self.init_db()
 
     def init_db(self):
-        self.conn = sqlite3.connect(self.filename)
-        self.c = self.conn.cursor()
         self.create_all_tables()
 
     def close(self):
