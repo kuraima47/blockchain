@@ -144,6 +144,17 @@ def update_config_with_defaults(config, default_config):
     return config
 
 
+def exclude(d, keys):
+    return [(k, v) for k, v in d if k not in keys]
+
+
+def check_values(o):
+    for f in vars(o):
+        if getattr(o, f) is None:
+            return False
+    return True
+
+
 # ###### colors ###############
 
 COLOR_FAIL = "\033[91m"

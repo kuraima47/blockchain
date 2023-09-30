@@ -1,6 +1,6 @@
 import rlp
-from crypto import recover, sign
-import json
+from crypto import recover, sign, sha3
+from utils import exclude, check_values, decode_hex
 
 
 class Transaction(rlp.Serializable):
@@ -23,8 +23,11 @@ class Transaction(rlp.Serializable):
 
     @property
     def hash(self):
-        print(rlp.encode(self))
-        return utils.sha3(rlp.encode(self))
+        return sha3(rlp.encode(self))
+
+    @property
+    def sign_hash(self):
+        return sha3(rlp.encode(exclude(self, ["v", "r", "s"])))
 
     @property
     def sender(self):
@@ -33,48 +36,26 @@ class Transaction(rlp.Serializable):
     def sign(self, key):
         self.v, self.r, self.s = sign(self.hash, key)
 
-    def to_dict(self):
-        return {
-            "nonce": self.nonce,
-            "gasPrice": self.gas_price,
-            "gas": self.gas,
-            "to": self.to,
-            "value": self.value,
-            "data": self.data,
-            "v": self.v,
-            "r": self.r,
-            "s": self.s,
-        }
+    def validate(self):
+        pass
 
-    @classmethod
-    def from_dict(cls, d):
-        return cls(
-            nonce=d["nonce"],
-            gas_price=d["gasPrice"],
-            gas=d["gas"],
-            to=d["to"],
-            value=d["value"],
-            data=d["data"],
-            v=d["v"],
-            r=d["r"],
-            s=d["s"],
-        )
+    @property
+    def is_valid(self):
+        if (
+            self.sender == self.to
+            or not check_values(self)
+            or not self.hash == sha3(rlp.encode(self))
+        ):
+            return False
+        return True
 
     def __repr__(self):
-        return "<Transaction({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8})>".format(
-            self.nonce,
-            self.gas_price,
-            self.gas,
-            self.to,
-            self.value,
-            self.data,
-            self.v,
-            self.r,
-            self.s,
-        )
+        return (f"<Transaction #{self.nonce} sender={self.sender} to={self.to} value={self.value} gas={self.gas} "
+                f"gas-price={self.gas_price})>")
 
-    def to_json(self):
-        return json.dumps(self.to_dict())
+    def encode_transaction(self):
+        return rlp.encode(self).hex()
 
-    def to_string(self):
-        return rlp.encode(self).encode("hex")
+    @classmethod
+    def decode_transaction(cls, hex_transaction):
+        return rlp.decode(decode_hex(hex_transaction), cls)

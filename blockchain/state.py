@@ -1,4 +1,5 @@
 import rlp
+from utils import decode_hex
 
 
 class State(rlp.Serializable):
@@ -76,3 +77,6 @@ class State(rlp.Serializable):
         self.accounts[sender] -= amount
         self.accounts[receiver] += amount
 
+    @classmethod
+    def decode_state(cls, hex_state):
+        return rlp.decode(decode_hex(hex_state), cls)
