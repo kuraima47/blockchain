@@ -7,6 +7,7 @@ import base64
 import json
 import argparse
 import socket
+from collections.abc import Mapping
 
 from eth_utils import *
 
@@ -129,9 +130,6 @@ def hex_decode_config(self):
                 _with_dict(v)
 
     _with_dict(self.config)
-
-
-from collections.abc import Mapping
 
 
 def update_config_with_defaults(config, default_config):

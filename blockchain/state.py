@@ -70,12 +70,15 @@ class State(rlp.Serializable):
         self.tx_pool.remove(tx)
 
     def transfer(self, sender, receiver, amount):
-        if sender not in self.accounts or receiver not in self.accounts:
+        if sender not in self.accounts | receiver not in self.accounts :
             raise ValueError("Either the sending or receiving account does not exist.")
         if self.accounts[sender] < amount:
             raise ValueError("Insufficient funds.")
         self.accounts[sender] -= amount
         self.accounts[receiver] += amount
+
+    def encode_state(self) -> str:
+        return rlp.encode(self).hex()
 
     @classmethod
     def decode_state(cls, hex_state):

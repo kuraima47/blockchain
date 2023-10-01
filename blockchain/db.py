@@ -4,6 +4,7 @@ import utils
 
 
 class Db:
+    # try to integrate merkle patricia tree
 
     def __init__(self, filename, recover=False):
         self.conn = sqlite3.connect(filename)

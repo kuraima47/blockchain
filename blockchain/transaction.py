@@ -22,38 +22,34 @@ class Transaction(rlp.Serializable):
         )
 
     @property
-    def hash(self):
+    def hash(self) -> bytes:
         return sha3(rlp.encode(self))
 
     @property
-    def sign_hash(self):
+    def sign_hash(self) -> bytes:
         return sha3(rlp.encode(exclude(self, ["v", "r", "s"])))
 
     @property
-    def sender(self):
+    def sender(self) -> bytes:
         return recover(self.hash, self.s)
 
     def sign(self, key):
         self.v, self.r, self.s = sign(self.hash, key)
 
-    def validate(self):
-        pass
-
     @property
     def is_valid(self):
         if (
             self.sender == self.to
-            or not check_values(self)
-            or not self.hash == sha3(rlp.encode(self))
+            & ~check_values(self)
         ):
             return False
         return True
 
     def __repr__(self):
-        return (f"<Transaction #{self.nonce} sender={self.sender} to={self.to} value={self.value} gas={self.gas} "
-                f"gas-price={self.gas_price})>")
+        return (f"<Transaction #{self.nonce} sender=Test to={self.to} value={self.value} gas={self.gas} "
+                f"gas-price={self.gas_price}>")
 
-    def encode_transaction(self):
+    def encode_transaction(self) -> str:
         return rlp.encode(self).hex()
 
     @classmethod
