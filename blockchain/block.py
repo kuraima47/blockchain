@@ -51,7 +51,9 @@ class Block(rlp.Serializable):
         return rlp.decode(decode_hex(hex_block), cls)
 
     def get_transaction(self, index):
-        return rlp.decode(decode_hex(self.transactions[index]), Transaction)
+        if isinstance(self.transactions[index], bytes):
+            return Transaction.decode_transaction(self.transactions[index].decode("utf-8"))
+        return Transaction.decode_transaction(self.transactions[index])
 
     @property
     def head(self):
@@ -65,7 +67,7 @@ class BlockHeader(rlp.Serializable):
         ("ommers_hash", rlp.sedes.binary),
         ("beneficiary", rlp.sedes.binary),
         ("difficulty", rlp.sedes.big_endian_int),
-        ("nonce", rlp.sedes.binary),
+        ("nonce", rlp.sedes.big_endian_int),
         ("gas_limit", rlp.sedes.big_endian_int),
         ("gas_used", rlp.sedes.big_endian_int),
         ("timestamp", rlp.sedes.big_endian_int),
@@ -77,6 +79,20 @@ class BlockHeader(rlp.Serializable):
 
     def __init__(self, number, parent_hash, ommers_hash, beneficiary, difficulty, nonce, gas_limit, gas_used, timestamp,
                  transaction_root, state_root, receipts_root, logs_bloom):
+
+        if not isinstance(number, int):
+            number = int.from_bytes(number, 'big')
+        if not isinstance(difficulty, int):
+            difficulty = int.from_bytes(difficulty, 'big')
+        if not isinstance(nonce, int):
+            nonce = int.from_bytes(nonce, 'big')
+        if not isinstance(gas_limit, int):
+            gas_limit = int.from_bytes(gas_limit, 'big')
+        if not isinstance(gas_used, int):
+            gas_used = int.from_bytes(gas_used, 'big')
+        if not isinstance(timestamp, int):
+            timestamp = int.from_bytes(timestamp, 'big')
+
         super(BlockHeader, self).__init__(number, parent_hash, ommers_hash, beneficiary, difficulty, nonce, gas_limit,
                                           gas_used, timestamp, transaction_root, state_root, receipts_root, logs_bloom)
 
