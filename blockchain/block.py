@@ -11,7 +11,7 @@ class Block(rlp.Serializable):
     ]
 
     def __init__(self, header=(), transactions=[]):
-        if header is not None:
+        if header == ():
             header = BlockHeader(0, b'', b'', b'', 0, b'\x00' * 8, 0, 0, 0, b'', b'', b'', b'')
         else:
             header = BlockHeader(*header)
@@ -28,7 +28,7 @@ class Block(rlp.Serializable):
         return f"<Block #{self.header.number} hash={self.hash.hex()} transactions={len(self.transactions)}>"
 
     def add_transaction(self, tx) -> None:
-        self.transactions.append(tx)
+        self.__dict__['_transactions'] += tx.encode_transaction,
 
     @property
     def is_valid_block(self) -> bool:
@@ -47,8 +47,15 @@ class Block(rlp.Serializable):
         return rlp.encode([self.header, self.transactions]).hex()
 
     @classmethod
-    def decode_block(cls, hex_block):
+    def decode_block(cls, hex_block: str):
         return rlp.decode(decode_hex(hex_block), cls)
+
+    def get_transaction(self, index):
+        return rlp.decode(decode_hex(self.transactions[index]), Transaction)
+
+    @property
+    def head(self):
+        return self.header
 
 
 class BlockHeader(rlp.Serializable):
@@ -79,3 +86,4 @@ class BlockHeader(rlp.Serializable):
     @classmethod
     def decode_header(cls, hex_header):
         return rlp.decode(decode_hex(hex_header), cls)
+

@@ -1,21 +1,10 @@
-from rlp import Serializable, encode, decode
-import rlp
+from blockchain.transaction import Transaction
+from blockchain.block import Block
 
-class Transaction(Serializable):
-    fields = [
-        ('sender', rlp.sedes.binary),
-        ('receiver', rlp.sedes.binary),
-        ('value', rlp.sedes.big_endian_int),
-    ]
 
-    def __init__(self, sender, receiver, value):
-        super(Transaction, self).__init__(sender, receiver, value)
-
-tx = Transaction(sender='Alice', receiver='Bob', value=10)
-encoded_tx = encode(tx)
-decoded_tx = decode(encoded_tx, Transaction)
-print(decoded_tx.sender)  # Affiche les données binaires
-
-# Décoder le champ pour obtenir la valeur originale
-original_sender = rlp.decode(decoded_tx.sender)[1:].decode('utf-8')
-print(original_sender)  # Devrait afficher 'Alice'
+b = Block((12, b'', b'', b'', 0, b'\x00' * 8, 0, 0, 0, b'', b'', b'', b''), [])
+b.add_transaction(Transaction(0, 0, 0, b'', 0, b''))
+b.add_transaction(Transaction(0, 0, 0, b'', 0, b''))
+print(b)
+print(b.get_transaction(0))
+print(b.head.number)

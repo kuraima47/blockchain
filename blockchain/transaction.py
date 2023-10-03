@@ -34,7 +34,7 @@ class Transaction(rlp.Serializable):
         return recover(self.hash, self.s)
 
     def sign(self, key):
-        self.v, self.r, self.s = sign(self.hash, key)
+        self.__dict__["_v"], self.__dict__["_r"], self.__dict__["_s"] = sign(self.hash, key)
 
     @property
     def is_valid(self):
@@ -49,6 +49,7 @@ class Transaction(rlp.Serializable):
         return (f"<Transaction #{self.nonce} sender=Test to={self.to} value={self.value} gas={self.gas} "
                 f"gas-price={self.gas_price}>")
 
+    @property
     def encode_transaction(self) -> str:
         return rlp.encode(self).hex()
 
