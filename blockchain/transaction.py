@@ -46,7 +46,7 @@ class Transaction(rlp.Serializable):
         return True
 
     def __repr__(self):
-        return (f"<Transaction #{self.nonce} sender=Test to={self.to} value={self.value} gas={self.gas} "
+        return (f"<{self.__class__.__name__} #{self.nonce} sender=Test to={self.to} value={self.value} gas={self.gas} "
                 f"gas-price={self.gas_price}>")
 
     @property

@@ -10,7 +10,7 @@ class Block(rlp.Serializable):
         ("transactions", rlp.sedes.CountableList(rlp.sedes.binary)),
     ]
 
-    def __init__(self, header, transactions=[]):
+    def __init__(self, header, transactions=()):
         super(Block, self).__init__(BlockHeader(*header), transactions)
 
     @property
@@ -21,7 +21,7 @@ class Block(rlp.Serializable):
         ]))
 
     def __repr__(self):
-        return f"<Block #{self.header.number} hash={self.hash.hex()} transactions={len(self.transactions)}>"
+        return f"<{self.__class__.__name__} #{self.header.number} hash={self.hash.hex()} transactions={len(self.transactions)}>"
 
     def add_transaction(self, tx) -> None:
         self.__dict__['_transactions'] += tx.encode_transaction,

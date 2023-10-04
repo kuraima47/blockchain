@@ -9,7 +9,7 @@ class Wallet(rlp.Serializable):
         ("tokens", rlp.sedes.CountableList(rlp.sedes.binary))
     ]
 
-    def __init__(self, addresse, tokens=[]):
+    def __init__(self, addresse, tokens=()):
         super(Wallet, self).__init__(addresse, tokens)
 
     @property
@@ -20,10 +20,17 @@ class Wallet(rlp.Serializable):
     def decode(cls, hex_wallet):
         return rlp.decode(decode_hex(hex_wallet), cls)
 
+    def add_token(self, token) -> None:
+        self.__dict__['_tokens'] += token.encode,
+
     def get_token(self, index):
         if isinstance(self.tokens[index], bytes):
             return Token.decode(self.tokens[index].decode("utf-8"))
         return Token.decode(self.tokens[index])
+
+    @property
+    def solde(self) -> float:
+        return sum([self.get_token(i).solde for i in range(len(self.tokens))])
 
 
 class Token(rlp.Serializable):
@@ -37,7 +44,7 @@ class Token(rlp.Serializable):
         super(Token, self).__init__()
 
     def __repr__(self):
-        return f"<Token addresse={self.addresse} montant={self.montant} >"
+        return f"<{self.__class__.__name__} addresse={self.addresse} montant={self.montant} >"
 
     @property
     def encode(self):

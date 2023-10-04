@@ -19,7 +19,7 @@ class Token(rlp.Serializable):
         pass
 
     def __repr__(self):
-        return (f"<Token name={self.name} symbol={self.symbol} decimals={self.decimals} totalSupply={self.totalSupply} "
+        return (f"<{self.__class__.__name__} name={self.name} symbol={self.symbol} decimals={self.decimals} totalSupply={self.totalSupply} "
                 f"balances={self.balances})>")
 
     def hash(self):
