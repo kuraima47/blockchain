@@ -10,12 +10,8 @@ class Block(rlp.Serializable):
         ("transactions", rlp.sedes.CountableList(rlp.sedes.binary)),
     ]
 
-    def __init__(self, header=(), transactions=[]):
-        if header == ():
-            header = BlockHeader(0, b'', b'', b'', 0, b'\x00' * 8, 0, 0, 0, b'', b'', b'', b'')
-        else:
-            header = BlockHeader(*header)
-        super(Block, self).__init__(header, transactions)
+    def __init__(self, header, transactions=[]):
+        super(Block, self).__init__(BlockHeader(*header), transactions)
 
     @property
     def hash(self) -> bytes:
@@ -98,8 +94,3 @@ class BlockHeader(rlp.Serializable):
 
     def __repr__(self) -> str:
         return rlp.encode(self).hex()
-
-    @classmethod
-    def decode_header(cls, hex_header):
-        return rlp.decode(decode_hex(hex_header), cls)
-
