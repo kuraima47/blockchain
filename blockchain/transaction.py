@@ -5,7 +5,6 @@ from utils import exclude, check_values, decode_hex
 
 class Transaction(rlp.Serializable):
     fields = [
-        ("nonce", rlp.sedes.big_endian_int),
         ("gas_price", rlp.sedes.big_endian_int),
         ("gas", rlp.sedes.big_endian_int),
         ("to", rlp.sedes.binary),
@@ -16,9 +15,9 @@ class Transaction(rlp.Serializable):
         ("s", rlp.sedes.big_endian_int),
     ]
 
-    def __init__(self, nonce, gas_price, gas, to, value, data, v=0, r=0, s=0):
+    def __init__(self, gas_price, gas, to, value, data, v=0, r=0, s=0):
         super(Transaction, self).__init__(
-            nonce, gas_price, gas, to, value, data, v, r, s
+            gas_price, gas, to, value, data, v, r, s
         )
 
     @property
@@ -46,7 +45,7 @@ class Transaction(rlp.Serializable):
         return True
 
     def __repr__(self):
-        return (f"<{self.__class__.__name__} #{self.nonce} sender=Test to={self.to} value={self.value} gas={self.gas} "
+        return (f"<{self.__class__.__name__} sender=Test to={self.to} value={self.value} gas={self.gas} "
                 f"gas-price={self.gas_price}>")
 
     @property
