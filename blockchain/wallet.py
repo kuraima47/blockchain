@@ -39,7 +39,7 @@ class Wallet(rlp.Serializable):
     @classmethod
     def new(cls):
         # Add Logic for create new wallet
-        return cls(os.urandom(20))
+        return cls(os.urandom(32))
 
 
 class Token(rlp.Serializable):
