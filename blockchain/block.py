@@ -15,10 +15,10 @@ class Block(rlp.Serializable):
 
     @property
     def hash(self) -> bytes:
-        return sha3(rlp.encode([
+        return sha3(sha3(rlp.encode([
             ("header", self.header),
             ("transactions", self.transactions)
-        ]))
+        ])))[::-1]
 
     def __repr__(self):
         return f"<{self.__class__.__name__} #{self.header.number} hash={self.hash.hex()} transactions={len(self.transactions)}>"
@@ -37,6 +37,10 @@ class Block(rlp.Serializable):
             if not tr.is_valid:
                 return False
         return True
+
+    def mine(self, difficulty: bytes):
+        while self.hash >= difficulty:
+            self.header.nonce += 1
 
     @property
     def encode_block(self) -> str:

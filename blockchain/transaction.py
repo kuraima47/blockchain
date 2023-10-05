@@ -39,7 +39,7 @@ class Transaction(rlp.Serializable):
     def is_valid(self):
         if (
             self.sender == self.to
-            & ~check_values(self)
+            | check_values(self)
         ):
             return False
         return True

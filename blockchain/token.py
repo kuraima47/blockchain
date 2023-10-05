@@ -6,15 +6,15 @@ from crypto import sha3
 class Token(rlp.Serializable):
 
     fields = [
-        ("name", rlp.sedes.CountableList(rlp.sedes.binary)),
-        ("symbol", rlp.sedes.CountableList(rlp.sedes.binary)),
-        ("decimals", rlp.sedes.CountableList(rlp.sedes.binary)),
-        ("totalSupply", rlp.sedes.CountableList(rlp.sedes.binary)),
-        ("balances", rlp.sedes.CountableList(rlp.sedes.binary)),
+        ("id", rlp.sedes.big_endian_int),
+        ("name", rlp.sedes.binary),
+        ("symbol", rlp.sedes.binary),
+        ("total_supply", rlp.sedes.big_endian_int),
+        ("balance", rlp.sedes.big_endian_int),
         ("allowances", rlp.sedes.CountableList(rlp.sedes.binary)),
     ]
 
-    def __init__(self):
+    def __init__(self, id=0, name="", symbol="", total_supply=0, balance=0, allowances=()):
         super(Token, self).__init__()
         pass
 

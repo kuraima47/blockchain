@@ -1,5 +1,7 @@
 import rlp
 from utils import decode_hex
+from crypto import sha3
+import os
 
 
 class Wallet(rlp.Serializable):
@@ -9,7 +11,9 @@ class Wallet(rlp.Serializable):
         ("tokens", rlp.sedes.CountableList(rlp.sedes.binary))
     ]
 
-    def __init__(self, addresse, tokens=()):
+    def __init__(self, addresse=b'', tokens=()):
+        if addresse == b'':
+            self.__dict__['_addresse'] = self.new
         super(Wallet, self).__init__(addresse, tokens)
 
     @property
@@ -32,19 +36,24 @@ class Wallet(rlp.Serializable):
     def solde(self) -> float:
         return sum([self.get_token(i).solde for i in range(len(self.tokens))])
 
+    @classmethod
+    def new(cls):
+        # Add Logic for create new wallet
+        return cls(os.urandom(20))
+
 
 class Token(rlp.Serializable):
 
     fields = [
-        ("addresse", rlp.sedes.binary),
+        ("hash", rlp.sedes.binary),
         ("solde", rlp.sedes.big_endian_int)
     ]
 
-    def __init__(self):
-        super(Token, self).__init__()
+    def __init__(self, hash, solde=0.0):
+        super(Token, self).__init__(hash, solde)
 
     def __repr__(self):
-        return f"<{self.__class__.__name__} addresse={self.addresse} montant={self.montant} >"
+        return f"<{self.__class__.__name__} addresse={self.addresse} montant={self.montant}>"
 
     @property
     def encode(self):
