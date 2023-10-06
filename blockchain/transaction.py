@@ -40,7 +40,7 @@ class Transaction(rlp.Serializable):
         if (
             self.sender == self.to
             | check_values(self)
-            # | check_nonce()
+            | self.check_nonce()
             # | check_balance()
             # | check_signature()
         ):
@@ -60,11 +60,18 @@ class Transaction(rlp.Serializable):
         return rlp.decode(decode_hex(hex_transaction), cls)
 
     def check_nonce(self):
-        # for dont have double depense
+        # acc = get_account(self.sender)
+        # if acc.get_nonce() == self.nonce:
+        #   return True
+        # return False
         pass
 
     def check_balance(self):
         # check if sender have enough money
+        # acc = get_account(self.sender)
+        # if acc.solde(token) >= self.value:
+        #   return True
+        # return False
         pass
 
     def check_signature(self):
