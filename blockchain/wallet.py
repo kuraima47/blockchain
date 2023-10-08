@@ -37,6 +37,9 @@ class Wallet(rlp.Serializable):
     def solde(self) -> float:
         return sum([self.get_token(i).solde for i in range(len(self.tokens))])
 
+    def solde(self, token) -> float:
+        return self.get_token(token).solde
+
     @classmethod
     def new(cls):
         # Add Logic for create new wallet
