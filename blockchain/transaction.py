@@ -1,6 +1,6 @@
 import rlp
 from crypto import recover, sign, sha3
-from utils import exclude, check_values, decode_hex
+from utils import exclude, check_values, decode_hex, check_nonce, check_balance, check_signature
 
 
 class Transaction(rlp.Serializable):
@@ -33,16 +33,16 @@ class Transaction(rlp.Serializable):
         return recover(self.hash, self.s)
 
     def sign(self, key):
-        self.__dict__["_v"], self.__dict__["_r"], self.__dict__["_s"] = sign(self.hash, key)
+        self.__dict__["_v"], self.__dict__["_r"], self.__dict__["_s"] = sign(self.sign_hash, key)
 
     @property
     def is_valid(self):
         if (
             self.sender == self.to
             | check_values(self)
-            | self.check_nonce()
-            # | check_balance()
-            # | check_signature()
+            | check_nonce(self.sender, self.nonce)
+            | check_balance(self.self.sender, self.value, self.gas_price)
+            | check_signature(self.sender, self.hash, self.s)
         ):
             return False
         return True
@@ -58,22 +58,3 @@ class Transaction(rlp.Serializable):
     @classmethod
     def decode_transaction(cls, hex_transaction):
         return rlp.decode(decode_hex(hex_transaction), cls)
-
-    def check_nonce(self):
-        # acc = get_account(self.sender)
-        # if acc.get_nonce() == self.nonce:
-        #   return True
-        # return False
-        pass
-
-    def check_balance(self):
-        # check if sender have enough money
-        # acc = get_account(self.sender)
-        # if acc.solde(token) >= self.value:
-        #   return True
-        # return False
-        pass
-
-    def check_signature(self):
-        # check if signature is valid
-        pass

@@ -8,7 +8,7 @@ import json
 import argparse
 import socket
 from collections.abc import Mapping
-
+from blockchain.blockchain import handler
 from eth_utils import *
 
 
@@ -151,6 +151,32 @@ def check_values(o):
         if getattr(o, f) is None:
             return False
     return True
+
+
+def check_nonce(sender, nonce):
+    # check if nonce is valid
+    # acc = get_account(self.sender)
+    # if acc.get_nonce() == self.nonce:
+    #   return True
+    # return False
+    pass
+
+
+def check_balance(sender, value, gas_price):
+    # check if sender have enough money
+    # acc = get_account(self.sender)
+    # if acc.solde(token) >= self.value + estimated_gas * self.gas_price:
+    #   return True
+    # return False
+    pass
+
+
+def check_signature(sender, hash, s):
+    # check if signature is valid
+    # if self.sender == recover(self.hash, self.s):
+    #   return True
+    # return False
+    pass
 
 
 # ###### colors ###############
