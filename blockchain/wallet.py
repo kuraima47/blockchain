@@ -8,7 +8,8 @@ class Wallet(rlp.Serializable):
 
     fields = [
         ("addresse", rlp.sedes.binary),
-        ("tokens", rlp.sedes.CountableList(rlp.sedes.binary))
+        ("tokens", rlp.sedes.CountableList(rlp.sedes.binary)),
+        ("nonce", rlp.sedes.big_endian_int),
     ]
 
     def __init__(self, addresse=b'', tokens=()):

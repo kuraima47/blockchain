@@ -41,6 +41,7 @@ class Block(rlp.Serializable):
     def mine(self, difficulty: bytes):
         while self.hash >= difficulty:
             self.header.nonce += 1
+        return self.hash
 
     @property
     def encode_block(self) -> str:

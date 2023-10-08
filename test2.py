@@ -1,6 +1,5 @@
 from blockchain.transaction import Transaction
 from blockchain.block import Block
-# b.add_transaction(Transaction(0, 0, b'', 0, b''))
 
 
 class Blockchain:
@@ -33,9 +32,9 @@ blockchain.add(b)
 print(blockchain)
 
 b = Block((2, blockchain.last_hash, b'', b'', 0, 0, 0, 0, 0, b'', b'', b'', b''), [])
-b.add_transaction(Transaction(0, 0, b'', 0, b''))
+b.add_transaction(Transaction(0, 0, b'toi', 0, b''))
 print(b)
-b.add_transaction(Transaction(0, 0, b'', 0, b''))
+b.add_transaction(Transaction(0, 0, b'toi', 0, b''))
 print(b)
 blockchain.add(b)
 print(blockchain)
