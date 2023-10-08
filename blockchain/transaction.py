@@ -1,6 +1,6 @@
 import rlp
 from crypto import recover, sign, sha3
-from utils import exclude, check_values, decode_hex, check_nonce, check_balance, check_signature
+from utils import exclude, decode_hex, check_values, check_nonce, check_balance, check_signature, check_gas
 
 
 class Transaction(rlp.Serializable):
@@ -38,8 +38,9 @@ class Transaction(rlp.Serializable):
     @property
     def is_valid(self):
         if (
-            self.sender == self.to
+            (self.sender == self.to)
             | check_values(self)
+            | check_gas(self.gas)
             | check_nonce(self.sender, self.nonce)
             | check_balance(self.self.sender, self.value, self.gas_price)
             | check_signature(self.sender, self.hash, self.s)

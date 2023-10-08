@@ -146,37 +146,51 @@ def exclude(d, keys):
     return [(k, v) for k, v in d if k not in keys]
 
 
+# Check return false because no error, if return true one error is detected
+
+
 def check_values(o):
+    # return false because all values are not None
     for f in vars(o):
         if getattr(o, f) is None:
-            return False
-    return True
+            return True
+    return False
 
 
 def check_nonce(sender, nonce):
+    # return false because nonce is valid
     # check if nonce is valid
     # acc = get_account(self.sender)
-    # if acc.get_nonce() == self.nonce:
+    # if acc.get_nonce() > self.nonce:
     #   return True
-    # return False
-    pass
+    return False
 
 
-def check_balance(sender, value, gas_price):
+def check_balance(sender, value, gas_price, type="standard"):
+    # return false because sender have enough money
     # check if sender have enough money
     # acc = get_account(self.sender)
-    # if acc.solde(token) >= self.value + estimated_gas * self.gas_price:
+    # estimated_gas = 21000 if type == "standard" else 90000
+    # if acc.solde(token) < self.value + estimated_gas * self.gas_price:
     #   return True
-    # return False
-    pass
+    return False
 
 
 def check_signature(sender, hash, s):
+    # return false because signature is valid
     # check if signature is valid
-    # if self.sender == recover(self.hash, self.s):
+    # if self.sender != recover(self.hash, self.s):
     #   return True
-    # return False
-    pass
+    return False
+
+
+def check_gas(gas, type="standard"):
+    # return false because gas is valid
+    # check if gas is valid
+    # estimated_gas = 21000 if type == "standard" else 90000
+    # if self.gas < estimated_gas:
+    #   return True
+    return False
 
 
 # ###### colors ###############
