@@ -1,5 +1,5 @@
 import rlp
-from utils import decode_hex
+from utils import decode_hex, parse_data, unparse_data
 # import lib of memory analysis
 
 
@@ -36,7 +36,8 @@ class Storage(rlp.Serializable):
 
     def __init__(self, hash=b'', data=None):
         """
-        for the moment data is list of bytes [b'', b'', b'']
+        data can take : list, dict, str, int, float, bytes, bool, None
+        data can't take : tuple
         """
         if data is None:
             data = [("hash", hash)]
@@ -57,6 +58,8 @@ class Storage(rlp.Serializable):
             return rlp.decode(decode_hex(hex_storage.decode('utf-8')))
         return rlp.decode(decode_hex(hex_storage))
 
-    def parser(self):
-        for o in vars():
-            print(o)
+    def parse(self):
+        return parse_data(self)
+
+    def unparse(self):
+        return unparse_data(self, self.data)

@@ -200,7 +200,8 @@ def is_dict(d):
 
 
 def parse(v):
-    if isinstance(v, int):
+
+    if isinstance(v, int) or isinstance(v, float) or isinstance(v, bool) or v is None:
         return bytes(str(v), "utf-8")
     elif isinstance(v, str):
         return bytes(v, "utf-8")
@@ -216,7 +217,13 @@ def parse(v):
 def unparse(v):
     if isinstance(v, bytes):
         s = v.decode("utf-8")
-        if is_integer(s):
+        if s == "True":
+            return True
+        elif s == "False":
+            return False
+        elif s == "None":
+            return None
+        elif is_integer(s):
             return int(s)
         elif is_float(s):
             return float(s)
@@ -242,7 +249,7 @@ def is_float(n):
 
 def parse_data(obj):
     obj.data = [(bytes(k, "utf-8"), parse(getattr(obj, k))) for k in vars(obj) if "data" not in k]
-    obj.parsed_data = rlp.encode(obj.data)
+    return rlp.encode(obj.data)
 
 
 def unparse_data(obj, data):
