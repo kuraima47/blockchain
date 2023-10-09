@@ -7,7 +7,7 @@
 - [ ] Concevoir la logique de verification des blocs
 - [ ] Faire des tests unitaires
 - [ ] API Complete à realiser avec tout les callbacks pour les clients
-- [ ] Réaliser un parser pour les différentes variables d'un contract
+- [x] Réaliser un parser pour les différentes variables d'un contract
 
 ### - baptiste :
 - [ ] Concevoir la logique et le système de création de wallet dans wallet.py

@@ -40,10 +40,10 @@ class Storage(rlp.Serializable):
         data can't take : tuple
         """
         if data is None:
-            data = [("hash", hash)]
+            data = ""
+        else:
+            unparse_data(self, data)
         super(Storage, self).__init__(hash, data)
-        for k, v in data:
-            self.__dict__[k] = v
 
     def __repr__(self):
         return f"<{self.__class__.__name__} hash={self.hash} data={self.data}>"
@@ -55,8 +55,8 @@ class Storage(rlp.Serializable):
     @classmethod
     def decode(cls, hex_storage):
         if isinstance(hex_storage, bytes):
-            return rlp.decode(decode_hex(hex_storage.decode('utf-8')))
-        return rlp.decode(decode_hex(hex_storage))
+            return rlp.decode(decode_hex(hex_storage.decode('utf-8')), cls)
+        return rlp.decode(decode_hex(hex_storage), cls)
 
     def parse(self):
         return parse_data(self)
