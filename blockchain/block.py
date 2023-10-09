@@ -52,8 +52,6 @@ class Block(rlp.Serializable):
         return rlp.decode(decode_hex(hex_block), cls)
 
     def get_transaction(self, index):
-        if isinstance(self.transactions[index], bytes):
-            return Transaction.decode_transaction(self.transactions[index].decode("utf-8"))
         return Transaction.decode_transaction(self.transactions[index])
 
     @property

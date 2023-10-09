@@ -23,6 +23,8 @@ class Wallet(rlp.Serializable):
 
     @classmethod
     def decode(cls, hex_wallet):
+        if isinstance(hex_wallet, bytes):
+            return rlp.decode(decode_hex(hex_wallet.decode("utf-8")), cls)
         return rlp.decode(decode_hex(hex_wallet), cls)
 
     def add_token(self, token) -> None:
@@ -65,4 +67,6 @@ class Token(rlp.Serializable):
 
     @classmethod
     def decode(cls, hex_token):
+        if isinstance(hex_token, bytes):
+            return rlp.decode(decode_hex(hex_token.decode("utf-8")), cls)
         return rlp.decode(decode_hex(hex_token), cls)

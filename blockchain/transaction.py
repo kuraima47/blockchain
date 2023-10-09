@@ -58,4 +58,6 @@ class Transaction(rlp.Serializable):
 
     @classmethod
     def decode_transaction(cls, hex_transaction):
+        if isinstance(hex_transaction, bytes):
+            return rlp.decode(decode_hex(hex_transaction.decode("utf-8")), cls)
         return rlp.decode(decode_hex(hex_transaction), cls)
