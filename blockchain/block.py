@@ -21,7 +21,11 @@ class Block(rlp.Serializable):
         ])))[::-1]
 
     def __repr__(self):
-        return f"<{self.__class__.__name__} #{self.header.number} hash={self.hash.hex()} transactions={len(self.transactions)}>"
+        return (f"<{self.__class__.__name__} "
+                f"#{self.header.number} "
+                f"hash={self.hash.hex()} "
+                f"transactions={len(self.transactions)}>"
+                )
 
     def add_transaction(self, tx) -> None:
         self.__dict__['_transactions'] += tx.encode_transaction,
@@ -92,8 +96,9 @@ class BlockHeader(rlp.Serializable):
         if not isinstance(timestamp, int):
             timestamp = int.from_bytes(timestamp, 'big')
 
-        super(BlockHeader, self).__init__(number, parent_hash, ommers_hash, beneficiary, difficulty, nonce, gas_limit,
-                                          gas_used, timestamp, transaction_root, state_root, receipts_root, logs_bloom)
+        super(BlockHeader, self).__init__(number, parent_hash, ommers_hash, beneficiary, difficulty, nonce,
+                                          gas_limit, gas_used, timestamp, transaction_root, state_root, receipts_root,
+                                          logs_bloom)
 
     def __repr__(self) -> str:
         return rlp.encode(self).hex()

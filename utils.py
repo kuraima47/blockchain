@@ -55,7 +55,6 @@ def int_to_big_endian4(integer):
 
 ienc4 = int_to_big_endian4
 
-
 node_uri_scheme = "mychain://v1."
 
 
@@ -64,7 +63,7 @@ def host_port_pubkey_from_uri(uri):
     b_uri = str_to_bytes(uri)
     assert b_uri.startswith(b_node_uri_scheme), b_uri
     node_info = json.loads(
-        base64.b64decode(bytes_to_str(uri)[len(node_uri_scheme) :]).decode()
+        base64.b64decode(bytes_to_str(uri)[len(node_uri_scheme):]).decode()
     )
     pubkey = decode_hex(node_info["pub_key"])
     assert len(pubkey) == 512 // 8
@@ -193,7 +192,65 @@ def check_gas(gas, type="standard"):
     return False
 
 
+def is_dict(d):
+    for i in d:
+        if not isinstance(i, list):
+            return False
+    return True
+
+
+def parse(v):
+    if isinstance(v, int):
+        return bytes(str(v), "utf-8")
+    elif isinstance(v, str):
+        return bytes(v, "utf-8")
+    elif isinstance(v, list):
+        return rlp.encode([parse(i) for i in v])
+    elif isinstance(v, dict):
+        return rlp.encode([(bytes(k, "utf-8"), parse(i)) for k, i in v.items()])
+    # else is when class is bytes
+    else:
+        return v
+
+
+def unparse(v):
+    if isinstance(v, bytes):
+        s = v.decode("utf-8")
+        if is_integer(s):
+            return int(s)
+        elif is_float(s):
+            return float(s)
+        else:
+            return s
+    elif is_dict(v):
+        return {k.decode("utf-8"): unparse(i) for k, i in v}
+    elif isinstance(v, list):
+        return [unparse(i) for i in v]
+
+
+def is_integer(n):
+    if n.startswith("-"):
+        n = n[1:]
+    return n.isdigit()
+
+
+def is_float(n):
+    if n.startswith("-"):
+        n = n[1:]
+    return n.replace('.', '', 1).isdigit()
+
+
+def parse_data(obj):
+    obj.data = [(bytes(k, "utf-8"), parse(getattr(obj, k))) for k in vars(obj) if "data" not in k]
+    obj.parsed_data = rlp.encode(obj.data)
+
+
+def unparse_data(obj, data):
+    for i in rlp.decode(data):
+        obj.__dict__[i[0].decode("utf-8")] = unparse(rlp.decode(i[1]))
+
 # ###### colors ###############
+
 
 COLOR_FAIL = "\033[91m"
 COLOR_BOLD = "\033[1m"

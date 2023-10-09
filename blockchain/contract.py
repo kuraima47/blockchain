@@ -5,7 +5,17 @@ from utils import decode_hex
 
 class Contract(rlp.Serializable):
 
+    fields = [
+        ("hash", rlp.sedes.binary),
+        ("code", rlp.sedes.binary),
+        ("storage_hash", rlp.sedes.binary),
+    ]
+
     def __init__(self, hash, code, storage_hash):
+        # self.storage = Storage.decode(get_storage(storage_hash))
+        """
+        Usage : self.storage.key
+        """
         super(Contract, self).__init__()
         pass
 
@@ -25,21 +35,17 @@ class Storage(rlp.Serializable):
     ]
 
     def __init__(self, hash=b'', data=None):
+        """
+        for the moment data is list of bytes [b'', b'', b'']
+        """
         if data is None:
             data = [("hash", hash)]
         super(Storage, self).__init__(hash, data)
+        for k, v in data:
+            self.__dict__[k] = v
 
     def __repr__(self):
         return f"<{self.__class__.__name__} hash={self.hash} data={self.data}>"
-
-    def get(self, key):
-        return [v for k, v in self.data][0]
-
-    def set(self, key, value):
-        for k, v in self.data:
-            if k == key:
-                self.data.remove((k, v))
-        self.data.append((key, value))
 
     @property
     def encode(self):
@@ -50,3 +56,7 @@ class Storage(rlp.Serializable):
         if isinstance(hex_storage, bytes):
             return rlp.decode(decode_hex(hex_storage.decode('utf-8')))
         return rlp.decode(decode_hex(hex_storage))
+
+    def parser(self):
+        for o in vars():
+            print(o)
