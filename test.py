@@ -5,11 +5,14 @@ import blockchain.blockchain as blockchain
 class A(Service):
     def __init__(self):
         super().__init__()
+        self.handler = blockchain.handler
+        assert isinstance(self, Service), "obj is not a Service"
+        blockchain.handler.register_service(self)
+        print("Service in handler:")
+        for service in blockchain.handler.services:
+            print(" Service :", blockchain.handler.services[service].name)
 
-
-obj = A()
-assert isinstance(obj, Service), "obj is not a Service"
-blockchain.handler.register_service(obj)
-print("Service in handler:")
-for service in blockchain.handler.services:
-    print(" Service :", blockchain.handler.services[service].name)
+    def afficherService(self):
+        print("Service in handler:")
+        for service in blockchain.handler.services:
+            print(" Service :", blockchain.handler.services[service].name)

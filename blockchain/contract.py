@@ -16,7 +16,7 @@ class Contract(rlp.Serializable):
         """
         Usage : self.storage.key
         """
-        super(Contract, self).__init__()
+        super(Contract, self).__init__(hash, code, storage_hash)
         pass
 
     def __repr__(self):
@@ -36,8 +36,8 @@ class Storage(rlp.Serializable):
 
     def __init__(self, hash=b'', data=None):
         """
-        data can take : list, dict, str, int, float, bytes, bool, None
-        data can't take : tuple
+        data can take : list, dict, str, int, float, bytes, bool, None, tuple
+        Essayer de faire une hashmap des types a chaque fois pour mieux gerer ce qui est int/str/float/bytes
         """
         if data is None:
             data = ""

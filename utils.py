@@ -200,48 +200,65 @@ def is_dict(d):
 
 
 def parse(v):
-
     if isinstance(v, int) or isinstance(v, float) or isinstance(v, bool) or v is None:
         return bytes(str(v), "utf-8")
     elif isinstance(v, str):
         return bytes(v, "utf-8")
+    elif isinstance(v, tuple):
+        return bytes("(" + str(b','.join([parse(i) for i in v])) + ")", "utf-8")
     elif isinstance(v, list):
         return rlp.encode([parse(i) for i in v])
     elif isinstance(v, dict):
         return rlp.encode([(bytes(k, "utf-8"), parse(i)) for k, i in v.items()])
-    # else is when class is bytes
     else:
         return v
 
 
 def unparse(v):
     if isinstance(v, bytes):
-        s = v.decode("utf-8")
-        if s == "True":
-            return True
-        elif s == "False":
-            return False
-        elif s == "None":
-            return None
-        elif is_integer(s):
-            return int(s)
-        elif is_float(s):
-            return float(s)
-        else:
-            return s
+        v = v.decode("utf-8")
+    if v == "True":
+        return True
+    elif v == "False":
+        return False
+    elif v == "None":
+        return None
+    elif is_integer(v):
+        return int(v)
+    elif is_float(v):
+        return float(v)
+    elif is_tuple(v):
+        t = [unparse(i) for i in v[3:len(v) - 2].split(",")]
+        return tuple(t)
     elif is_dict(v):
         return {k.decode("utf-8"): unparse(i) for k, i in v}
     elif isinstance(v, list):
         return [unparse(i) for i in v]
+    else:
+        try:
+            return unparse(rlp.decode(bytes(v, "utf-8")))
+        except:
+            return v
+
+
+def is_tuple(n):
+    n = str(n)
+    if n.startswith("(") and n.endswith(")") and n.count(",") > 0:
+        return True
+    return False
 
 
 def is_integer(n):
+    if not isinstance(n, str):
+        return False
     if n.startswith("-"):
         n = n[1:]
     return n.isdigit()
 
 
 def is_float(n):
+    if not isinstance(n, str):
+        return False
     if n.startswith("-"):
         n = n[1:]
     return n.replace('.', '', 1).isdigit()
@@ -255,6 +272,7 @@ def parse_data(obj):
 def unparse_data(obj, data):
     for i in rlp.decode(data):
         obj.__dict__[i[0].decode("utf-8")] = unparse(rlp.decode(i[1]))
+
 
 # ###### colors ###############
 

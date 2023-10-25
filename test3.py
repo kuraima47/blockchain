@@ -1,18 +1,15 @@
-import rlp
 from utils import parse_data, unparse_data
 
 
 class A:
-
     def __init__(self):
-        self.data = []
+        t = (1, 2, 3)
+        self.a = {"a": t, "b": ["2R", 3, 5], "c": 2}
 
 
 a = A()
+print(vars(a))
+data = parse_data(a)
 b = A()
-a.__dict__["new"] = {"name": "coucou"}
-a.__dict__["new_test"] = [1, 2, 3]
-print(a.__dict__)
-unparse_data(b, parse_data(a))
-print(b.__dict__)
-
+unparse_data(b, data)
+print(vars(b))
