@@ -32,8 +32,7 @@ class Block(rlp.Serializable):
 
     @property
     def is_valid_block(self) -> bool:
-        self.validate_transactions()
-        return True
+        return self.validate_transactions()
 
     def validate_transactions(self) -> bool:
         for tx in self.transactions:

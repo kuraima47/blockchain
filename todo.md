@@ -5,6 +5,9 @@
 - [ ] Conecvoir le Merkle Patrica Tree (représentation abstraite pour le moment)
 - [ ] Concevoir la logique de verification des transactions
 - [ ] Concevoir la logique de verification des blocs
+- [ ] Concevoir l'implémentation de la gestion de l'api exterieure
+- [ ] Concevoir le DNS pour le routage vers les nodes (les nodes font le routage ? ou c'est un service tier ?)
+- [ ] Concevoir l'implémentation de la gestion de la blockchain avec les handlers
 - [ ] Faire des tests unitaires
 - [ ] API Complete à realiser avec tout les callbacks pour les clients
 - [x] Réaliser un parser pour les différentes variables d'un contract
