@@ -4,7 +4,7 @@ from utils import parse_data, unparse_data
 class A:
     def __init__(self):
         t = (1, 2, 3)
-        self.a = {"a": t, "b": ["2R", 3, 5], "c": 2}
+        self.a = {"a": t, "b": ["2R", 3, 5], "c": True, "d": False}
 
 
 a = A()

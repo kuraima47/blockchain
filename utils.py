@@ -200,45 +200,49 @@ def is_dict(d):
 
 
 def parse(v):
-    if isinstance(v, int) or isinstance(v, float) or isinstance(v, bool) or v is None:
-        return bytes(str(v), "utf-8")
+    if isinstance(v, int) or isinstance(v, float) or isinstance(v, bool):
+        return rlp.encode([bytes(v.__class__.__name__, "utf-8"), bytes(str(v), "utf-8")])
     elif isinstance(v, str):
-        return bytes(v, "utf-8")
+        return rlp.encode([bytes(v.__class__.__name__, "utf-8"), bytes(v, "utf-8")])
     elif isinstance(v, tuple):
-        return bytes("(" + str(b','.join([parse(i) for i in v])) + ")", "utf-8")
+        return rlp.encode([bytes(v.__class__.__name__, "utf-8"),
+                           bytes("(" + str(b','.join([parse(i) for i in v])) + ")", "utf-8")])
     elif isinstance(v, list):
-        return rlp.encode([parse(i) for i in v])
+        return rlp.encode([bytes(v.__class__.__name__, "utf-8"), [parse(i) for i in v]])
     elif isinstance(v, dict):
-        return rlp.encode([(bytes(k, "utf-8"), parse(i)) for k, i in v.items()])
+        return rlp.encode([bytes(v.__class__.__name__, "utf-8"),
+                           [(bytes(k, "utf-8"), parse(i)) for k, i in v.items()]])
     else:
         return v
 
 
 def unparse(v):
-    if isinstance(v, bytes):
-        v = v.decode("utf-8")
-    if v == "True":
-        return True
-    elif v == "False":
-        return False
-    elif v == "None":
-        return None
-    elif is_integer(v):
-        return int(v)
-    elif is_float(v):
-        return float(v)
-    elif is_tuple(v):
-        t = [unparse(i) for i in v[3:len(v) - 2].split(",")]
+    try:
+        v = rlp.decode(v)
+    except: v = v
+    if isinstance(v[0], bytes):
+        v[0] = v[0].decode("utf-8")
+    if isinstance(v[1], bytes):
+        v[1] = v[1].decode("utf-8")
+    cn, o = v
+    if cn == "dict":
+        return {k.decode("utf-8"): unparse(rlp.decode(i)) for k, i in o}
+    elif cn == "bool":
+        return True if o == "True" else False
+    elif cn == "int":
+        return int(o)
+    elif cn == "float":
+        return float(o)
+    elif cn == "tuple":
+        t = [unparse(i.encode('utf-8').decode('unicode_escape').encode('latin1')) for i in o[3:len(o) - 2].split(",")]
         return tuple(t)
-    elif is_dict(v):
-        return {k.decode("utf-8"): unparse(i) for k, i in v}
-    elif isinstance(v, list):
-        return [unparse(i) for i in v]
+    elif cn == "list":
+        return [unparse(i) for i in o]
     else:
         try:
-            return unparse(rlp.decode(bytes(v, "utf-8")))
+            return unparse(rlp.decode(bytes(o, "utf-8")))
         except:
-            return v
+            return o
 
 
 def is_tuple(n):

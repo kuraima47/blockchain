@@ -20,7 +20,7 @@ class Handler:
 
     def deregister_service(self, service):
         assert isinstance(service, Service)
-        self.services.remove(service)
+        self.services.pop(service)
         delattr(self.services, service.name)
 
 
