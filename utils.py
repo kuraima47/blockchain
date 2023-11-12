@@ -245,29 +245,6 @@ def unparse(v):
             return o
 
 
-def is_tuple(n):
-    n = str(n)
-    if n.startswith("(") and n.endswith(")") and n.count(",") > 0:
-        return True
-    return False
-
-
-def is_integer(n):
-    if not isinstance(n, str):
-        return False
-    if n.startswith("-"):
-        n = n[1:]
-    return n.isdigit()
-
-
-def is_float(n):
-    if not isinstance(n, str):
-        return False
-    if n.startswith("-"):
-        n = n[1:]
-    return n.replace('.', '', 1).isdigit()
-
-
 def parse_data(obj):
     obj.data = [(bytes(k, "utf-8"), parse(getattr(obj, k))) for k in vars(obj) if "data" not in k]
     return rlp.encode(obj.data)
