@@ -13,6 +13,7 @@ class LevelDbStorage:
         return value
 
     def __setitem__(self, key, value):
+        print(f"key : {key} value : {value}")
         self.db.put(key, value)
 
     def close(self):

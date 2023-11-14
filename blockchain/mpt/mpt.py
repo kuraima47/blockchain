@@ -37,7 +37,6 @@ class MerklePatriciaTrie:
         self._storage = LevelDbStorage(storage)
         self._root = root
         self._secure = secure
-        self._storage.close()
 
     def root(self):
         """Returns a root node of the trie.
@@ -103,6 +102,7 @@ class MerklePatriciaTrie:
         return self.update(encoded_key, encoded_value)
 
     def update(self, encoded_key, encoded_value):
+
         """This method updates a provided key-value pair into the trie.
 
         If there is no such a key in the trie, a new entry will be created.
@@ -126,7 +126,6 @@ class MerklePatriciaTrie:
         path = NibblePath(encoded_key)
 
         result = self._update(self._root, path, encoded_value)
-
         self._root = result
 
     def __delitem__(self, encoded_key):
