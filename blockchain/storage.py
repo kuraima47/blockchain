@@ -1,4 +1,4 @@
-from .trie.mpt import MerklePatriciaTrie
+from .mpt.mpt import MerklePatriciaTrie
 
 
 class Storage:
