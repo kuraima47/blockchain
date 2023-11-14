@@ -7,9 +7,11 @@ from .hash import keccak_hash
 from .nibble_path import NibblePath
 from .node import Node
 
+from .lvlDB.levelDB import LevelDbStorage
+
 
 class MerklePatriciaTrie:
-    def __init__(self, storage, root=None, secure=False):
+    def __init__(self, storage: str, root=None, secure=False):
         """Creates a new instance of MPT.
 
         MerklePatriciaTrie works like a wrapper over provided storage.
@@ -32,9 +34,10 @@ class MerklePatriciaTrie:
         MerklePatriciaTrie
             An instance of MPT.
         """
-        self._storage = storage
+        self._storage = LevelDbStorage(storage)
         self._root = root
         self._secure = secure
+        self._storage.close()
 
     def root(self):
         """Returns a root node of the trie.

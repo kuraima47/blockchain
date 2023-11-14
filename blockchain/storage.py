@@ -4,7 +4,7 @@ from .mpt.mpt import MerklePatriciaTrie
 class Storage:
 
     def __init__(self):
-        self.storage = {}
+        self.storage = "blockchain/mpt/lvlDB/DB/"
         self.trie = MerklePatriciaTrie(self.storage)
 
     def __repr__(self):
