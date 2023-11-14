@@ -23,7 +23,7 @@ class Contract(rlp.Serializable):
         return f"<{self.__class__.__name__}>"
 
     def execute(self):
-        # execute self.code
+        # execute self.code need to lib C
         pass
 
 
