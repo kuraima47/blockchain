@@ -1,4 +1,5 @@
 from .mpt.mpt import MerklePatriciaTrie
+from .mpt.hash import keccak_hash
 
 
 class Storage:
@@ -13,13 +14,13 @@ class Storage:
     def __getitem__(self, key):
         trie = MerklePatriciaTrie(self.storage, root=self.current_root)
         try:
-            return trie.get(key)
+            return trie.get(keccak_hash(key))
         except KeyError:
             return None
 
     def __setitem__(self, key, value):
         trie = MerklePatriciaTrie(self.storage, root=self.current_root)
-        trie.update(key, value)
+        trie.update(keccak_hash(key), value)
         self.current_root = trie.root_hash()
 
     def __repr__(self):

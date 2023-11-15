@@ -2,7 +2,7 @@
 ### - kuraima :
 - [ ] Concevoir le state.py et le stockage des données
 - [ ] Concevoir le consensus.py et le protocole de consensus
-- [ ] Conecvoir le Merkle Patrica Tree (représentation abstraite pour le moment)
+- [x] Conecvoir le Merkle Patrica Tree
 - [ ] Concevoir la logique de verification des transactions
 - [ ] Concevoir la logique de verification des blocs
 - [ ] Concevoir l'implémentation de la gestion de l'api exterieure
