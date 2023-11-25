@@ -27,5 +27,21 @@ class Handler:
 class Service:
 
     def __init__(self):
+        self.sub_service = IterableUserDict()
         self.name = self.__class__.__name__
 
+    def init_sub_service(self, service=[]):
+        for s in service:
+            self.register_service(s)
+
+    def register_service(self, service):
+        assert isinstance(service, Service)
+        assert service.name not in self.sub_service
+        print("registering service", service.name)
+        self.sub_service[service.name] = service
+        setattr(self.sub_service, service.name, service)
+
+    def deregister_service(self, service):
+        assert isinstance(service, Service)
+        self.sub_service.pop(service)
+        delattr(self.sub_service, service.name)
