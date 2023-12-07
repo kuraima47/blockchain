@@ -11,7 +11,7 @@ from .lvlDB.levelDB import LevelDbStorage
 
 
 class MerklePatriciaTrie:
-    def __init__(self, storage: str, root=None, secure=False):
+    def __init__(self, storage: str, in_memory=False, root=None, secure=False):
         """Creates a new instance of MPT.
 
         MerklePatriciaTrie works like a wrapper over provided storage.
@@ -34,7 +34,14 @@ class MerklePatriciaTrie:
         MerklePatriciaTrie
             An instance of MPT.
         """
-        self._storage = LevelDbStorage(storage)
+
+        if in_memory and root:
+            s = {}
+            for k, v in LevelDbStorage(storage):
+                s[k] = v
+            self._storage = s
+        else:
+            self._storage = {} if in_memory else LevelDbStorage(storage)
         self._root = root
         self._secure = secure
 
