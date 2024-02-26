@@ -1,3 +1,5 @@
+from blockchain.block import BlockHeader
+
 CIPHERNAMES = set(("aes-128-ctr",))
 import warnings
 import os
@@ -289,6 +291,16 @@ recover = ecdsa_recover
 
 def sha3(seed):
     return sha3_256(seed).digest()
+
+
+def fvn(a: int, b: int) -> int:
+    return a*0x01000193 ^ b
+
+
+def fvnHash(mix: [int], data: [int]) -> int:
+    for i in len(mix):
+        mix[i] = mix[i]*0x01000193 ^ data[i]
+    return mix
 
 
 def mk_privkey(seed):

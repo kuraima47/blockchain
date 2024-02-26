@@ -1,4 +1,4 @@
-from blockchain.storage import Storage
+from .blockchain.storage import Storage
 
 
 def test_storage():

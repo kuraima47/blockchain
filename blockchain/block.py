@@ -9,10 +9,14 @@ class Block(rlp.Serializable):
     fields = [
         ("header", rlp.sedes.CountableList(rlp.sedes.binary)),
         ("transactions", rlp.sedes.CountableList(rlp.sedes.binary)),
+        ("uncles", rlp.sedes.CountableList(rlp.sedes.binary)),
+        ("withdrawals", rlp.sedes.CountableList(rlp.sedes.binary)),
     ]
 
-    def __init__(self, header, transactions=()):
-        super(Block, self).__init__(BlockHeader(*header), transactions)
+    def __init__(self, header, transactions=(), uncles=(), withdrawals=()):
+        if not isinstance(header, BlockHeader):
+            header = BlockHeader(*header)
+        super(Block, self).__init__(header, transactions, uncles, withdrawals)
 
     @property
     def hash(self) -> bytes:
@@ -75,12 +79,11 @@ class Block(rlp.Serializable):
         self.header.transaction_storage.save(d)
 
 
-
 class BlockHeader(rlp.Serializable):
     fields = [
         ("number", rlp.sedes.big_endian_int),
         ("parent_hash", rlp.sedes.binary),
-        ("ommers_hash", rlp.sedes.binary),
+        ("uncles_hash", rlp.sedes.binary),
         ("beneficiary", rlp.sedes.binary),
         ("difficulty", rlp.sedes.big_endian_int),
         ("nonce", rlp.sedes.big_endian_int),
@@ -91,9 +94,10 @@ class BlockHeader(rlp.Serializable):
         ("state_root", rlp.sedes.binary),
         ("receipts_root", rlp.sedes.binary),
         ("logs_bloom", rlp.sedes.binary),
+        ("extra_data", rlp.sedes.binary),
     ]
 
-    def __init__(self, number, parent_hash, ommers_hash, beneficiary, difficulty, nonce, gas_limit, gas_used, timestamp,
+    def __init__(self, number, parent_hash, uncles_hash, beneficiary, difficulty, nonce, gas_limit, gas_used, timestamp,
                  transaction_root, state_root, receipts_root, logs_bloom):
 
         self.state_storage = Storage(state_root, True)
@@ -113,9 +117,14 @@ class BlockHeader(rlp.Serializable):
         if not isinstance(timestamp, int):
             timestamp = int.from_bytes(timestamp, 'big')
 
-        super(BlockHeader, self).__init__(number, parent_hash, ommers_hash, beneficiary, difficulty, nonce,
+        super(BlockHeader, self).__init__(number, parent_hash, uncles_hash, beneficiary, difficulty, nonce,
                                           gas_limit, gas_used, timestamp, transaction_root, state_root, receipts_root,
                                           logs_bloom)
 
     def __repr__(self) -> str:
         return rlp.encode(self).hex()
+
+    @property
+    def hash(self) -> bytes:
+        return sha3(sha3(rlp.encode(self)))[::-1]
+

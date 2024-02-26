@@ -7,7 +7,7 @@ from .hash import keccak_hash
 from .nibble_path import NibblePath
 from .node import Node
 
-from .lvlDB.levelDB import LevelDbStorage
+from .Database import DBParser
 
 
 class MerklePatriciaTrie:
@@ -35,13 +35,7 @@ class MerklePatriciaTrie:
             An instance of MPT.
         """
 
-        if in_memory and root:
-            s = {}
-            for k, v in LevelDbStorage(storage):
-                s[k] = v
-            self._storage = s
-        else:
-            self._storage = {} if in_memory else LevelDbStorage(storage)
+        self._storage = DBParser(on_dump=not in_memory)
         self._root = root
         self._secure = secure
 

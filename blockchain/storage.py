@@ -5,7 +5,7 @@ from .mpt.hash import keccak_hash
 class Storage:
 
     def __init__(self, storage_root=None, in_memory=False):
-        self.storage = "blockchain/mpt/lvlDB/DB/"
+        self.storage = "blockchain/mpt/Database/DB/"
         self.current_root = storage_root
         self._in_memory = in_memory
 
