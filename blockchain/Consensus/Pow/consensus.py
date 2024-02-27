@@ -9,6 +9,7 @@ from repoze.lru import LRUCache
 from blockchain.Consensus import *
 import time
 
+from blockchain.Consensus.Pow.dataset import Dataset
 from crypto import sha3, fvn, fvnHash
 
 params = {
@@ -236,6 +237,7 @@ class ProofOfWork(Engine):
                 attempts += 1
                 if (attempts % (1 << 15)) == 0:
                     # hashrate.mark(attempts)
+                    # TODO Need To Implement hashrate marker
                     print("Hashrate", attempts)
                     attempts = 0
 
@@ -248,24 +250,18 @@ class ProofOfWork(Engine):
                 nonce += 1
 
     def dataset(self, number: int, is_async: bool) -> bytes:
-        # TODO Need To Implement Generation Dataset + Généation and Cache
         epoch = number // params["epochLength"]
-        current, future = self.datasets.get(epoch)
+        current: Dataset = self.datasets.get(epoch)
 
-        if is_async and not current.generated():  # TODO Need To Implement
+        if is_async and not current.generated():
             def func():
-                current.generate(dir="", limit=0, lock=False, test=False)  # TODO Need To Implement
-                if future is not None:
-                    future.generate(dir="", limit=0, lock=False, test=False)  # Todo Need To Implement
+                current.generate(dir="", limit=0, lock=False, test=False)
 
             threading.Thread(target=func).start()
         else:
-            current.generate(dir="", limit=0, lock=False, test=False)  # TODO Need To Implement
-            if future is not None:
-                future.generate(dir="", limit=0, lock=False, test=False)  # Todo Need To Implement
+            current.generate(dir="", limit=0, lock=False, test=False)
 
-        current = b""  # TODO Delete When generate is Implement
-        return current
+        return current.dataset
 
 
 def verifyHeader(chain: ChainHeaderReader, header: BlockHeader, parent: BlockHeader, uncle: bool, now: int) -> bool:
@@ -297,8 +293,8 @@ def verifyHeader(chain: ChainHeaderReader, header: BlockHeader, parent: BlockHea
 
 
 def calcDifficulty(config: dict, time: int, parent: BlockHeader) -> int:
-    next = parent.number + 1
-    match config.get(next):
+    nextConfig = parent.number + 1
+    match config.get(nextConfig):
         case 0:
             return 0
         case _:

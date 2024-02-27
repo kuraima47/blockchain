@@ -15,12 +15,12 @@ class Token(rlp.Serializable):
     ]
 
     def __init__(self, id=0, name="", symbol="", total_supply=0, balance=0, allowances=()):
-        super(Token, self).__init__()
+        super(Token, self).__init__(id, name, symbol, total_supply, balance, allowances)
         pass
 
     def __repr__(self):
-        return (f"<{self.__class__.__name__} name={self.name} symbol={self.symbol} decimals={self.decimals} totalSupply={self.totalSupply} "
-                f"balances={self.balances})>")
+        return (f"<{self.__class__.__name__} name={self.name} symbol={self.symbol} totalSupply={self.total_supply} "
+                f"balance={self.balance})>")
 
     def hash(self):
         return sha3(rlp.encode(self))
