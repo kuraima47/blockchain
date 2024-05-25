@@ -249,7 +249,7 @@ def lzpad32(x):
 
 
 def _encode_sig(v, r, s):
-    assert isinstance(v, (int, long))
+    assert isinstance(v, int)
     assert v in (27, 28)
     vb, rb, sb = chr(v - 27), bitcoin.encode(r, 256), bitcoin.encode(s, 256)
     return lzpad32(rb) + lzpad32(sb) + vb

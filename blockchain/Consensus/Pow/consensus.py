@@ -237,7 +237,7 @@ class ProofOfWork(Engine):
                 attempts += 1
                 if (attempts % (1 << 15)) == 0:
                     # hashrate.mark(attempts)
-                    # TODO Need To Implement hashrate marker
+                    # TODO Need To Implement hashrate marker later
                     print("Hashrate", attempts)
                     attempts = 0
 
