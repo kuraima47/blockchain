@@ -1,22 +1,18 @@
-import os
 
 
-# le but est de construire un fichier {"relative_path": "bytes of code"} pour chaque fichier sans oublier les sous-dossiers et les fichiers dans les sous-dossiers en fonction d'un dossier racine
 class Analyse:
 
-    def __init__(self, path):
-        self.path = path
+    def __init__(self):
         self.files = {}
         self.analyse()
 
-    def analyse(self):
-        for root, _, files in os.walk(self.path):
-            for file in files:
-                with open(os.path.join(root, file), "rb") as f:
-                    self.files[os.path.relpath(os.path.join(root, file), self.path)] = f.read().decode("utf-8")
+    def analyse(self, logs=""):
+        for line in logs.split("\n"):
+            if "File" in line:
+                self.files[line.split(" ")[1].strip()] = line.split(" : ")[2].strip()
 
     def get_files(self):
         return self.files
 
     def __repr__(self):
-        return f"<{self.__class__.__name__} path={self.path} files={len(self.files)}>"
+        return f"<{self.__class__.__name__} files={len(self.files)}>"
