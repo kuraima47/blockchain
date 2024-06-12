@@ -9,9 +9,11 @@ class Extractor:
             self.gas += self.__opcode_to_gas(self.__log_to_opcode(log))
 
     def __log_to_opcode(self, log) -> str:
+        # TODO: Implement this method
         pass
 
     def __opcode_to_gas(self, opcode) -> int:
+        # TODO: Implement this method
         pass
 
     def __repr__(self):
