@@ -1,4 +1,4 @@
-from blockchain.handler import Handler
+from handler import Handler
 
 
 handler = Handler()

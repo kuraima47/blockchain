@@ -1,18 +1,21 @@
+import os
 
 
 class Analyse:
 
-    def __init__(self):
+    def __init__(self, path:str):
+        self.path = path
         self.files = {}
         self.analyse()
 
-    def analyse(self, logs=""):
-        for line in logs.split("\n"):
-            if "File" in line:
-                self.files[line.split(" ")[1].strip()] = line.split(" : ")[2].strip()
+    def analyse(self) -> None:
+        for root, _, files in os.walk(self.path):
+            for file in files:
+                with open(os.path.join(root, file), "rb") as f:
+                    self.files[os.path.relpath(os.path.join(root, file), self.path).replace("\\", "/")] = f.read().decode("utf-8")
 
-    def get_files(self):
+    def get_files(self) -> dict:
         return self.files
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<{self.__class__.__name__} files={len(self.files)}>"
