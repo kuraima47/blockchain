@@ -46,6 +46,8 @@ class VM:
             container.exec_run("pip3 install --no-cache-dir --no-compile -r /contract/requirements.txt", stream=True, stdout=True, stderr=True)
             result = container.exec_run("python3 smart_contract.py")
             print(result.output.decode("utf-8"))
+            container.stop()
+            container.remove()
         except docker.errors.APIError as e:
             print(f"Error during container execution: {e}")
 
