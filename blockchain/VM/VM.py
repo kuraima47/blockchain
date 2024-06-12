@@ -20,7 +20,6 @@ class VM:
 
     def build_image(self, path, buildargs=None):
         try:
-            print(f"Building image with context path: {path}")
             image, build_logs = self.client.images.build(
                 path=path,
                 dockerfile="Dockerfile",
@@ -28,9 +27,6 @@ class VM:
                 buildargs=buildargs,
                 rm=True,
             )
-            for log in build_logs:
-                if 'stream' in log:
-                    print(log['stream'].strip())
         except docker.errors.BuildError as e:
             print(f"Build log: {e.build_log}")
             raise docker.errors.BuildError(e.msg, e.build_log)
