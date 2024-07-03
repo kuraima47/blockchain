@@ -1,21 +1,25 @@
-import os
+import json
+from collections import Counter
 
 
-class Analyse:
+class Analyser:
 
-    def __init__(self, path:str):
-        self.path = path
-        self.files = {}
-        self.analyse()
+    def __init__(self, version):
+        self.bytesCodes = BytesCodes().get_bytecodes(version)
 
-    def analyse(self) -> None:
-        for root, _, files in os.walk(self.path):
-            for file in files:
-                with open(os.path.join(root, file), "rb") as f:
-                    self.files[os.path.relpath(os.path.join(root, file), self.path).replace("\\", "/")] = f.read().decode("utf-8")
+    def analyse(self, logs):
+        opcode_counts = Counter()
+        for line in logs.split("\n"):
+            if line.startswith("*    "):
+                opcode = line.split("(")[1].split(")")[0]
+                opcode_counts.update(opcode)
+        return sum(self.bytesCodes[opcode] * count for opcode, count in opcode_counts.items() if opcode in self.bytesCodes.keys())
 
-    def get_files(self) -> dict:
-        return self.files
 
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__} files={len(self.files)}>"
+class BytesCodes:
+
+    def __init__(self):
+        self.bytesCodes = {"3.12": {"LOAD_CONST": 1, "LOAD_FAST": 2, "CALL_FUNCTION": 3, "RETURN_VALUE": 4}}
+
+    def get_bytecodes(self, version):
+        return self.bytesCodes.get(version)

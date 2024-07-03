@@ -2,6 +2,7 @@ import docker
 import os
 import io
 import tarfile
+from blockchain.compiler.analyse import Analyser
 
 
 class VM:
@@ -10,7 +11,7 @@ class VM:
             self.client = docker.from_env()
         except docker.errors.DockerException as e:
             raise docker.errors.DockerException(f"Failed to connect to Docker daemon: {e}.")
-
+        self.analyser = Analyser(code.version)
         self.tag = f"smart_contract_{code.version}"
         self.code = code
         dockerfile_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "Docker"))
@@ -41,7 +42,10 @@ class VM:
         try:
             container.exec_run("pip3 install --no-cache-dir --no-compile -r /contract/requirements.txt", stream=True, stdout=True, stderr=True)
             result = container.exec_run("python3 smart_contract.py")
-            print(result.output.decode("utf-8"))
+            resp = result.output.decode("utf-8")
+            print(resp)
+            price = self.analyser.analyse(resp)
+            print(f"Execution price: {price}")
             container.stop()
             container.remove()
         except docker.errors.APIError as e:
