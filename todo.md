@@ -1,10 +1,10 @@
 # Todo :
 ### - kuraima :
-- [ ] Concevoir le state.py et le stockage des données
+- [x] Concevoir le state.py et le stockage des données
 - [x] Concevoir le consensus.py et le protocole de consensus
 - [x] Conecvoir le Merkle Patrica Tree
-- [ ] Concevoir la logique de verification des transactions
-- [ ] Concevoir la logique de verification des blocs
+- [x] Concevoir la logique de verification des transactions
+- [x] Concevoir la logique de verification des blocs
 - [ ] Concevoir l'implémentation de la gestion de l'api exterieure
 - [ ] Concevoir le DNS pour le routage vers les nodes (les nodes font le routage ? ou c'est un service tier ?)
 - [ ] Concevoir l'implémentation de la gestion de la blockchain avec les handlers

@@ -1,6 +1,5 @@
 import rlp
 from utils import decode_hex, parse_data, unparse_data
-# import lib of memory analysis
 
 
 class Contract(rlp.Serializable):
@@ -21,10 +20,6 @@ class Contract(rlp.Serializable):
 
     def __repr__(self):
         return f"<{self.__class__.__name__}>"
-
-    def execute(self):
-        # execute self.code need to lib C
-        pass
 
 
 class Storage(rlp.Serializable):

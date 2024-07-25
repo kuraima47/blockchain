@@ -1,1 +1,3 @@
-print("je suis beau")
+
+def test2():
+    print("je suis beau")

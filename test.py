@@ -16,3 +16,6 @@ class A(Service):
         print("Service in handler:")
         for service in blockchain.handler.services:
             print(" Service :", blockchain.handler.services[service].name)
+
+service = A()
+service.handler.services[service.name].afficherService()

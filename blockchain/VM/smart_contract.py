@@ -1,3 +1,4 @@
+# smart_contract.py
 import json
 import importlib.util
 import pickle
@@ -9,10 +10,11 @@ class Contract:
 
     def __init__(self):
         data = json.loads(open('contract/contract.json').read())
+        params = json.loads(open('params.json').read())
         self.main = data['project_main']
         self.path = f"contract/{self.main}"
         self.contract = None
-        self.func = data["callable_function"]
+        self.func = params["callable_function"]
 
     def init(self):
         spec = importlib.util.spec_from_file_location("smart_contract", self.path)
@@ -39,7 +41,10 @@ class Contract:
         sys._getframe().f_trace_opcodes = True
         sys.settrace(self.__trace_calls)
         sys._getframe().f_trace = self.__trace_calls
-        getattr(self.contract, func_name)(*args)
+        try:
+            getattr(self.contract, func_name)(*args)
+        except Exception as e:
+            print(f"Error during execution: {e}")
         sys.settrace(None)
 
     def __trace_lines(self, frame, event, arg):
@@ -60,7 +65,7 @@ class Contract:
         func_name = co.co_name
         opcode = co.co_code[frame.f_lasti]
         opcode_name = dis.opname[opcode]
-        print('*    {} opcode {} ({})'.format(func_name, opcode, opcode_name))
+        print('*Infos : {} opcode {} ({})'.format(func_name, opcode, opcode_name))
         return self.__traces_opcodes
 
     def __trace_calls(self, frame, event, arg):

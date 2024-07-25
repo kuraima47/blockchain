@@ -70,3 +70,5 @@ class Token(rlp.Serializable):
         if isinstance(hex_token, bytes):
             return rlp.decode(decode_hex(hex_token.decode("utf-8")), cls)
         return rlp.decode(decode_hex(hex_token), cls)
+
+# TODO implément wallet delivery

@@ -3,6 +3,5 @@
   "module_import": "requirement.txt",
   "project_name": "my_project",
   "project_description": "This is a project description",
-  "project_main": "main.py",
-  "callable_function": "main"
+  "project_main": "test.py"
 }

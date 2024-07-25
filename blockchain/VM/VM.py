@@ -1,19 +1,24 @@
+import json
+
 import docker
 import os
 import io
 import tarfile
-from blockchain.compiler.analyse import Analyser
+from .extractor import Extractor
 
 
 class VM:
-    def __init__(self, code):
+    def __init__(self, code, func=""):
         try:
             self.client = docker.from_env()
         except docker.errors.DockerException as e:
             raise docker.errors.DockerException(f"Failed to connect to Docker daemon: {e}.")
-        self.analyser = Analyser(code.version)
+        self.extractor = Extractor(code.version)
         self.tag = f"smart_contract_{code.version}"
         self.code = code
+        params = json.loads(open(os.path.abspath(os.path.join(os.path.dirname(__file__), 'params.json'))).read())
+        params["callable_function"] = func
+        open(os.path.abspath(os.path.join(os.path.dirname(__file__), 'params.json')), 'w').write(json.dumps(params))
         dockerfile_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "Docker"))
         if not os.path.isdir(dockerfile_path):
             raise FileNotFoundError(f"The directory {dockerfile_path} does not exist.")
@@ -39,15 +44,17 @@ class VM:
         for filepath, filecontent in self.code.module.items():
             self._add_file_to_container(container, f"contract/{filepath}", filecontent)
         self._add_file_to_container(container, "smart_contract.py")
+        self._add_file_to_container(container, "params.json")
         try:
             container.exec_run("pip3 install --no-cache-dir --no-compile -r /contract/requirements.txt", stream=True, stdout=True, stderr=True)
             result = container.exec_run("python3 smart_contract.py")
             resp = result.output.decode("utf-8")
-            print(resp)
-            price = self.analyser.analyse(resp)
+            price = self.extractor.extract(resp)
+            contract_logs = "\n".join([line for line in resp.split("\n") if not line.strip().startswith('*')])
+            print(f"Contract logs: \n{contract_logs}")
             print(f"Execution price: {price}")
-            container.stop()
-            container.remove()
+            #container.stop()
+            #container.remove()
         except docker.errors.APIError as e:
             print(f"Error during container execution: {e}")
 
