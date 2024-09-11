@@ -1,21 +1,22 @@
 import rlp
 from utils import decode_hex
 from crypto import sha3
+from .Wallet.wallet import create_address
 import os
 
 
 class Wallet(rlp.Serializable):
 
     fields = [
-        ("addresse", rlp.sedes.binary),
+        ("address", rlp.sedes.binary),
         ("tokens", rlp.sedes.CountableList(rlp.sedes.binary)),
         ("nonce", rlp.sedes.big_endian_int),
     ]
 
-    def __init__(self, addresse=b'', tokens=()):
-        if addresse == b'':
-            self.__dict__['_addresse'] = self.new
-        super(Wallet, self).__init__(addresse, tokens)
+    def __init__(self, address=b'', tokens=(), nonce=0):
+        if address == b'':
+            self.__dict__['_address'] = self.new
+        super(Wallet, self).__init__(address, tokens, nonce)
 
     @property
     def encode(self):
@@ -35,6 +36,9 @@ class Wallet(rlp.Serializable):
             return Token.decode(self.tokens[index].decode("utf-8"))
         return Token.decode(self.tokens[index])
 
+    def get_address(self):
+        return Address.decode(self.address)
+
     @property
     def solde(self) -> float:
         return sum([self.get_token(i).solde for i in range(len(self.tokens))])
@@ -44,8 +48,10 @@ class Wallet(rlp.Serializable):
 
     @classmethod
     def new(cls):
-        # Add Logic for create new wallet
-        return cls(os.urandom(32))
+        n_add = create_address()
+        encoded_children = [Children(c["address"], c["xpublic_key"], c["path"], c["bip32_path"]).encode for c in n_add["children"]]
+        address = Address(n_add["public_key"], n_add["private_key"], n_add["coin"], n_add["xpublic_key"], n_add["xprivate_key"], n_add["address"], n_add["wif"], encoded_children).encode
+        return cls(address, [], 0)
 
 
 class Token(rlp.Serializable):
@@ -59,7 +65,7 @@ class Token(rlp.Serializable):
         super(Token, self).__init__(hash, solde)
 
     def __repr__(self):
-        return f"<{self.__class__.__name__} addresse={self.addresse} montant={self.montant}>"
+        return f"<{self.__class__.__name__} hash={self.hash} solde={self.solde}>"
 
     @property
     def encode(self):
@@ -71,4 +77,58 @@ class Token(rlp.Serializable):
             return rlp.decode(decode_hex(hex_token.decode("utf-8")), cls)
         return rlp.decode(decode_hex(hex_token), cls)
 
-# TODO implément wallet delivery
+
+class Address(rlp.Serializable):
+
+    fields = [
+        ("public_key", rlp.sedes.binary),
+        ("private_key", rlp.sedes.binary),
+        ("coin", rlp.sedes.binary),
+        ("xpublic_key", rlp.sedes.binary),
+        ("xprivate_key", rlp.sedes.binary),
+        ("address", rlp.sedes.binary),
+        ("wif", rlp.sedes.binary),
+        ("children", rlp.sedes.CountableList(rlp.sedes.binary)),
+    ]
+
+    def __init__(self, public_key=b'', private=b'', coin=b'', xpublic_key=b'', xprivate='', address=b'', wif=b'', children=()):
+        super(Address, self).__init__(public_key, private, coin, xpublic_key, xprivate, address, wif, children)
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__} address={self.address} coin={self.coin}>"
+
+    @property
+    def encode(self):
+        return rlp.encode(self).hex()
+
+    @classmethod
+    def decode(cls, hex_address):
+        if isinstance(hex_address, bytes):
+            return rlp.decode(decode_hex(hex_address.decode("utf-8")), cls)
+        return rlp.decode(decode_hex(hex_address), cls)
+
+
+class Children(rlp.Serializable):
+
+    fields = [
+        ("address", rlp.sedes.binary),
+        ("xpublic_key", rlp.sedes.binary),
+        ("path", rlp.sedes.binary),
+        ("bip32_path", rlp.sedes.binary),
+    ]
+
+    def __init__(self, address=b'', xpublic_key=b'', path=b'', bip32_path=b''):
+        super(Children, self).__init__(address, xpublic_key, path, bip32_path)
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__} address={self.address} path={self.path}>"
+
+    @property
+    def encode(self):
+        return rlp.encode(self).hex()
+
+    @classmethod
+    def decode(cls, hex_children):
+        if isinstance(hex_children, bytes):
+            return rlp.decode(decode_hex(hex_children.decode("utf-8")), cls)
+        return rlp.decode(decode_hex(hex_children), cls)

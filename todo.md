@@ -12,4 +12,5 @@
 - [ ] API Complete à realiser avec tout les callbacks pour les clients
 - [x] Réaliser un parser pour les différentes variables d'un contract
 - [x] Mise en place d'un handler pour récupérer les différents service possible (ne pas oublier d'ajouter les threads ou processus)
-- [ ] Concevoir la logique et le système de création de wallet dans wallet.py
+- [x] Concevoir la logique et le système de création de wallet dans wallet.py
+- [ ] Realiser l'implémentation de "blockchain.py", "handler.py", "miner.py"

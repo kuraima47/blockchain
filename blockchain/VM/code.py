@@ -13,8 +13,8 @@ class Code:
         self.name = name
         self.version = version
 
-    def save(self):
-        pass
+    def save(self, new_storage):
+        self.storage = new_storage
 
     def add_storage(self, storage):
         self.storage = storage
