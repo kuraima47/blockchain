@@ -2,11 +2,10 @@ try:
     from UserDict import IterableUserDict
 except ImportError:
     from collections import UserDict as IterableUserDict
-from service import BaseService
-from slogging import get_logger
-import utils
-import crypto
-from utils import decode_hex, parse_arguments, get_local_ip, str_to_bytes
+from kademlia.service import BaseService
+from kademlia.slogging import get_logger
+from kademlia import crypto, utils, slogging
+from kademlia.utils import decode_hex, parse_arguments, get_local_ip, str_to_bytes
 
 __version__ = "0.0.1"
 
@@ -60,10 +59,8 @@ def main():
     import signal
     import gevent
     from gevent.event import Event
-    from peermanager import PeerManager
-    from discovery import NodeDiscovery
-    import slogging
-    import argparse
+    from kademlia.peermanager import PeerManager
+    from kademlia.discovery import NodeDiscovery
 
     slogging.basicConfig()
     log = slogging.get_logger("app")

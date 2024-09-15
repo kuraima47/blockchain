@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from sympy import isprime
 
-from crypto import sha3, fvn, fvnHash
+from kademlia.crypto import sha3, fvn, fvnHash
 
 
 class Dataset:

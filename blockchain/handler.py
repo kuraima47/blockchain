@@ -1,3 +1,6 @@
+from app import BaseApp
+from kademlia.service import BaseService
+
 try:
     from UserDict import IterableUserDict
 except ImportError:
@@ -6,7 +9,8 @@ except ImportError:
 
 class Handler:
 
-    def __init__(self, services=[]):
+    def __init__(self, services=[], config={}):
+        super().__init__(config)
         self.services = IterableUserDict()
         for service in services:
             self.register_service(service)
@@ -23,10 +27,21 @@ class Handler:
         self.services.pop(service)
         delattr(self.services, service.name)
 
+    def broadcast_transaction(self, transaction):
+        pass
 
-class Service:
+    def broadcast_block(self, block):
+        pass
 
-    def __init__(self):
+    def handle_new_block(self, block):
+        if self.blockchain.add_block(block):
+            pass
+
+
+class Service(BaseService):
+
+    def __init__(self, app):
+        super().__init__(app)
         self.sub_service = IterableUserDict()
         self.name = self.__class__.__name__
 
@@ -38,6 +53,7 @@ class Service:
         assert isinstance(service, Service)
         assert service.name not in self.sub_service
         print("registering service", service.name)
+        service.register_with_app(self.app)
         self.sub_service[service.name] = service
         setattr(self.sub_service, service.name, service)
 

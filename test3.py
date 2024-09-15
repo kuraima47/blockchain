@@ -1,4 +1,4 @@
-from utils import parse_data, unparse_data
+from kademlia.utils import parse_data, unparse_data
 
 
 class A:

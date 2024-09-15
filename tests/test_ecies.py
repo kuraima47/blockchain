@@ -1,5 +1,5 @@
 import devp2p.crypto as crypto
-from utils import decode_hex
+from kademlia.utils import decode_hex
 
 
 def test_ecies_enc():

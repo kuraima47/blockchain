@@ -15,6 +15,7 @@ class Contract:
         self.path = f"contract/{self.main}"
         self.contract = None
         self.func = params["callable_function"]
+        self.params = params["params"]
 
     def init(self):
         spec = importlib.util.spec_from_file_location("smart_contract", self.path)
@@ -90,4 +91,4 @@ if __name__ == "__main__":
     state = contract.load_state()
     if state is not None:
         contract.set_state(state)
-    contract.execute(contract.func, 1, 2, 3)
+    contract.execute(contract.func, *contract.params)

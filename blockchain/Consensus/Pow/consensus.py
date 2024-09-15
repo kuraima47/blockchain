@@ -1,7 +1,4 @@
-import os
-import random
 from queue import Queue
-import threading
 
 import rlp
 from repoze.lru import LRUCache
@@ -10,7 +7,7 @@ from blockchain.Consensus import *
 import time
 
 from blockchain.Consensus.Pow.dataset import Dataset
-from crypto import sha3, fvn, fvnHash
+from kademlia.crypto import sha3, fvn, fvnHash
 
 params = {
     "DifficultyBoundDivisor": 2048,

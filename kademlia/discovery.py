@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
 import time
-from socket import AF_INET, AF_INET6
 
 from repoze.lru import LRUCache
 import gevent

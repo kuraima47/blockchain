@@ -1,10 +1,10 @@
 import random
 
-import peermanager
-from service import BaseService
-from discovery import NodeDiscovery
-from crypto import privtopub as privtopub_raw, sha3
-from utils import host_port_pubkey_to_uri, update_config_with_defaults
+from kademlia import peermanager
+from kademlia.service import BaseService
+from kademlia.discovery import NodeDiscovery
+from kademlia.crypto import privtopub as privtopub_raw, sha3
+from kademlia.utils import host_port_pubkey_to_uri, update_config_with_defaults
 from eth_utils import encode_hex
 import gevent
 import copy

@@ -1,6 +1,6 @@
 from devp2p.rlpxcipher import RLPxSession
 from devp2p.crypto import ECCx, privtopub
-from utils import decode_hex
+from kademlia.utils import decode_hex
 
 test_values = {
     "initiator_private_key": "5e173f6ac3c669587538e7727cf19b782a4f2fda07c1eaa662c593e5e85e3051",

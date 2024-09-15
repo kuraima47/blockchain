@@ -1,6 +1,6 @@
 import rlp
-from utils import decode_hex
-from crypto import sha3
+from kademlia.utils import decode_hex
+from kademlia.crypto import sha3
 
 
 class Token(rlp.Serializable):

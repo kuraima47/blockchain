@@ -30,5 +30,10 @@ class Storage:
         trie.update(keccak_hash(key), value)
         self.current_root = trie.root_hash()
 
+    def copy(self):
+        new_storage = Storage(self.current_root)
+        new_storage._in_memory = self._in_memory
+        return new_storage
+
     def __repr__(self):
         return f"<{self.__class__.__name__}>"

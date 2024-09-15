@@ -7,5 +7,5 @@ from compiler.analysecontract import AnalyseContract
 files = AnalyseContract("./compiler/test").get_files()
 version = json.loads(files["contract.json"])["py_version"]
 code = Code.construct(files, version)
-vm = VM(code, "main")
+vm = VM(code, "main", [1, 2, 3])
 vm.execute()

@@ -1,7 +1,3 @@
-import platform
-
-import pytest
-
 from devp2p import peermanager, peer
 from devp2p import crypto
 from devp2p.app import BaseApp
@@ -11,7 +7,7 @@ import devp2p.p2p_protocol
 import time
 import gevent
 import copy
-from utils import encode_hex, decode_hex, str_to_bytes
+from kademlia.utils import encode_hex, decode_hex, str_to_bytes
 
 
 def get_connected_apps():

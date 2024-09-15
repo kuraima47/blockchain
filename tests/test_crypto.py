@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from devp2p import crypto
-from utils import decode_hex
+from kademlia.utils import decode_hex
 import random
 import pytest
 

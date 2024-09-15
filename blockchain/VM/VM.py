@@ -8,7 +8,7 @@ from .extractor import Extractor
 
 
 class VM:
-    def __init__(self, code, func=""):
+    def __init__(self, code, func="", param=[]):
         try:
             self.client = docker.from_env()
         except docker.errors.DockerException as e:
@@ -18,6 +18,7 @@ class VM:
         self.code = code
         params = json.loads(open(os.path.abspath(os.path.join(os.path.dirname(__file__), 'params.json'))).read())
         params["callable_function"] = func
+        params["params"] = param
         open(os.path.abspath(os.path.join(os.path.dirname(__file__), 'params.json')), 'w').write(json.dumps(params))
         dockerfile_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "Docker"))
         if not os.path.isdir(dockerfile_path):
@@ -70,3 +71,6 @@ class VM:
             tarinfo.size = len(data)
             tar.addfile(tarinfo, io.BytesIO(data))
         container.put_archive("/", module.getvalue())
+
+    def get_output(self):
+        pass

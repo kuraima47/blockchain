@@ -3,11 +3,9 @@ import gevent
 import socket
 import atexit
 import time
-import re
 from gevent.server import StreamServer
-from gevent.socket import create_connection, timeout
+from gevent.socket import create_connection
 from service import WiredService
-from protocol import BaseProtocol
 from p2p_protocol import P2PProtocol
 from upnp import add_portmap, remove_portmap
 import kademlia

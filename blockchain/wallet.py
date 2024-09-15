@@ -1,8 +1,6 @@
 import rlp
-from utils import decode_hex
-from crypto import sha3
+from kademlia.utils import decode_hex
 from .Wallet.wallet import create_address
-import os
 
 
 class Wallet(rlp.Serializable):
@@ -88,11 +86,11 @@ class Address(rlp.Serializable):
         ("xprivate_key", rlp.sedes.binary),
         ("address", rlp.sedes.binary),
         ("wif", rlp.sedes.binary),
-        ("children", rlp.sedes.CountableList(rlp.sedes.binary)),
+        ("childrens", rlp.sedes.CountableList(rlp.sedes.binary)),
     ]
 
-    def __init__(self, public_key=b'', private=b'', coin=b'', xpublic_key=b'', xprivate='', address=b'', wif=b'', children=()):
-        super(Address, self).__init__(public_key, private, coin, xpublic_key, xprivate, address, wif, children)
+    def __init__(self, public_key=b'', private=b'', coin=b'', xpublic_key=b'', xprivate='', address=b'', wif=b'', childrens=()):
+        super(Address, self).__init__(public_key, private, coin, xpublic_key, xprivate, address, wif, childrens)
 
     def __repr__(self):
         return f"<{self.__class__.__name__} address={self.address} coin={self.coin}>"

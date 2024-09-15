@@ -1,6 +1,6 @@
 import rlp
-from crypto import recover, sign, sha3
-from utils import exclude, decode_hex, check_values, check_nonce, check_balance, check_signature, check_gas
+from kademlia.crypto import recover, sign, sha3
+from kademlia.utils import exclude, decode_hex, check_values, check_nonce, check_balance, check_signature, check_gas
 
 
 class Transaction(rlp.Serializable):
@@ -16,6 +16,7 @@ class Transaction(rlp.Serializable):
     ]
 
     def __init__(self, gas_price, gas, to, value, data, v=0, r=0, s=0):
+        data = rlp.decode(data) if isinstance(data, bytes) else data
         super(Transaction, self).__init__(
             gas_price, gas, to, value, data, v, r, s
         )

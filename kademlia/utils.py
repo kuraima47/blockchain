@@ -8,8 +8,10 @@ import json
 import argparse
 import socket
 from collections.abc import Mapping
-from blockchain.blockchain import handler
 from eth_utils import *
+from hashlib import sha3_256
+
+from blockchain.storage import Storage
 
 
 def str_to_bytes(s):
@@ -254,6 +256,79 @@ def unparse_data(obj, data):
     for i in rlp.decode(data):
         obj.__dict__[i[0].decode("utf-8")] = unparse(rlp.decode(i[1]))
 
+
+def generate_contract_address(creator_address, creator_nonce):
+    rlp_encoded = rlp.encode([creator_address, creator_nonce])
+    contract_address = sha3_256(rlp_encoded).digest()[12:]  # Prendre les 20 derniers octets
+    return contract_address
+
+
+def get_function_selector(function_signature):
+    # function_signature est une chaîne comme 'transfer(address,uint256)'
+    keccak_hash = keccak(text=function_signature)
+    return keccak_hash[:4]  # Les 4 premiers octets
+
+
+def encode_uint256(value: int):
+    return value.to_bytes(32, byteorder='big')
+
+
+def encode_address(value):
+    if isinstance(value, str):
+        value = bytes.fromhex(value.replace('0x', ''))
+    return value.rjust(32, b'\0')  # Padding à gauche pour atteindre 32 octets
+
+
+def encode_bool(value):
+    return (b'\x01' if value else b'\x00').rjust(32, b'\0')
+
+
+def encode_abi(arg_types, args):
+    if len(arg_types) != len(args):
+        raise ValueError("Le nombre de types et d'arguments ne correspond pas.")
+
+    encoded_args = b''
+    for arg_type, arg in zip(arg_types, args):
+        if arg_type == 'uint256':
+            encoded_args += encode_uint256(arg)
+        elif arg_type == 'address':
+            encoded_args += encode_address(arg)
+        elif arg_type == 'bool':
+            encoded_args += encode_bool(arg)
+        else:
+            raise NotImplementedError(f"Type non supporté : {arg_type}")
+    return encoded_args
+
+
+def encode_function_call(function_name, arg_types, args):
+    function_signature = f"{function_name}({','.join(arg_types)})"
+    function_hash = keccak(function_signature.encode())
+    function_selector = function_hash[:4]  # Les 4 premiers octets
+
+    encoded_args = encode_abi(arg_types, args)
+
+    return function_selector + encoded_args
+
+
+def encode_function_call_no_args(function_name):
+    function_signature = f"{function_name}()"
+    function_hash = keccak(function_signature.encode())
+    function_selector = function_hash[:4]
+    return function_selector
+
+
+def compute_transactions_root(transactions):
+    thx_mpt = Storage(in_memory=True)
+    for tx in transactions:
+        thx_mpt[tx.hash] = rlp.encode
+    return thx_mpt.current_root
+
+
+def compute_receipts_root(receipts):
+    receipts_mpt = Storage(in_memory=True)
+    for receipt in receipts:
+        receipts_mpt[receipt.transaction_hash] = rlp.encode(receipt)
+    return receipts_mpt.current_root
 
 # ###### colors ###############
 

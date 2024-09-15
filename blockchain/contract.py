@@ -1,5 +1,5 @@
 import rlp
-from utils import decode_hex, parse_data, unparse_data
+from kademlia.utils import decode_hex, parse_data, unparse_data
 
 
 class Contract(rlp.Serializable):

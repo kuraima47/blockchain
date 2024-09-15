@@ -1,6 +1,6 @@
 import rlp
-from crypto import sha3
-from utils import decode_hex
+from kademlia.crypto import sha3
+from kademlia.utils import decode_hex
 from blockchain.transaction import Transaction
 from .storage import Storage
 
@@ -98,7 +98,7 @@ class BlockHeader(rlp.Serializable):
     ]
 
     def __init__(self, number, parent_hash, uncles_hash, beneficiary, difficulty, nonce, gas_limit, gas_used, timestamp,
-                 transaction_root, state_root, receipts_root, logs_bloom):
+                 transaction_root, state_root, receipts_root, logs_bloom, extra_data=b''):
 
         self.state_storage = Storage(state_root, True)
         self.transaction_storage = Storage(in_memory=True) if transaction_root is b'' else Storage(transaction_root, True)
@@ -119,7 +119,7 @@ class BlockHeader(rlp.Serializable):
 
         super(BlockHeader, self).__init__(number, parent_hash, uncles_hash, beneficiary, difficulty, nonce,
                                           gas_limit, gas_used, timestamp, transaction_root, state_root, receipts_root,
-                                          logs_bloom)
+                                          logs_bloom, extra_data)
 
     def __repr__(self) -> str:
         return rlp.encode(self).hex()
