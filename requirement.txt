@@ -5,8 +5,12 @@ cryptography
 pycryptodome
 gevent
 pyopenssl
-pyelliptic==1.5.7
 pyyaml
 repoze.lru
 upnpy
 rlp
+sympy
+base58
+ecdsa
+mnemonic
+sha256

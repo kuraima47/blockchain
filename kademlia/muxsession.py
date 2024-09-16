@@ -1,7 +1,7 @@
 import gevent
-from multiplexer import Multiplexer, Packet
-from rlpxcipher import RLPxSession
-from crypto import ECCx
+from kademlia.multiplexer import Multiplexer, Packet
+from kademlia.rlpxcipher import RLPxSession
+from kademlia.crypto import ECCx
 
 
 class MultiplexedSession(Multiplexer):

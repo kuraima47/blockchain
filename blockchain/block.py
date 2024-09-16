@@ -1,6 +1,6 @@
 import rlp
-from kademlia.crypto import sha3
 from kademlia.utils import decode_hex
+from kademlia.crypto import sha3
 from blockchain.transaction import Transaction
 from .storage import Storage
 
@@ -101,8 +101,8 @@ class BlockHeader(rlp.Serializable):
                  transaction_root, state_root, receipts_root, logs_bloom, extra_data=b''):
 
         self.state_storage = Storage(state_root, True)
-        self.transaction_storage = Storage(in_memory=True) if transaction_root is b'' else Storage(transaction_root, True)
-        self.receipts_storage = Storage(in_memory=True) if receipts_root is b'' else Storage(receipts_root, True)
+        self.transaction_storage = Storage(in_memory=True) if transaction_root == b'' else Storage(transaction_root, True)
+        self.receipts_storage = Storage(in_memory=True) if receipts_root == b'' else Storage(receipts_root, True)
 
         if not isinstance(number, int):
             number = int.from_bytes(number, 'big')

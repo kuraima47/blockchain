@@ -1,9 +1,9 @@
 import time
 import gevent
 from rlp import sedes
-from multiplexer import Packet
-from protocol import BaseProtocol
-import slogging
+from kademlia.multiplexer import Packet
+from kademlia.protocol import BaseProtocol
+import kademlia.slogging as slogging
 import collections
 
 

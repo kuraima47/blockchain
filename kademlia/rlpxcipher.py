@@ -4,14 +4,11 @@ import struct
 import os
 import rlp
 from rlp import sedes
-from utils import safe_ord, str_to_bytes, ascii_chr
-from crypto import sha3
+from kademlia.utils import safe_ord, str_to_bytes, ascii_chr, ienc  # integer encode
+from kademlia.crypto import sha3, ECCx, ecdsa_recover, ecdsa_verify
 from Crypto.Hash import keccak
-from crypto import ECCx
-from crypto import ecdsa_recover
-from crypto import ecdsa_verify
-import pyelliptic
-from utils import ienc  # integer encode
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
 import Crypto.Cipher.AES as AES
 
 sha3_256 = lambda x: keccak.new(digest_bits=256, update_after_digest=True, data=x)
@@ -149,8 +146,8 @@ class RLPxSession(object):
         frame_mac = data[read_size : read_size + 16]
         assert len(frame_mac) == 16
 
-        # ingres-mac.update(aes(mac-secret,ingres-mac) ^
-        # left128(ingres-mac.update(frame-ciphertext).digest))
+        # ingres-mac.update(aes(mac-secret,ingress-mac) ^
+        # left128(ingress-mac.update(frame-ciphertext).digest))
         fmac_seed = mac(frame_ciphertext)
         expected_frame_mac = mac(sxor(self.mac_enc(mac()[:16]), fmac_seed[:16]))[:16]
         if not frame_mac == expected_frame_mac:
@@ -452,10 +449,22 @@ class RLPxSession(object):
             self.egress_mac, self.ingress_mac = mac2, mac1
 
         ciphername = "aes-256-ctr"
-        iv = "\x00" * 16
+        iv = b"\x00" * 16  # Utiliser des octets au lieu de chaînes de caractères
         assert len(iv) == 16
-        self.aes_enc = pyelliptic.Cipher(self.aes_secret, iv, 1, ciphername=ciphername)
-        self.aes_dec = pyelliptic.Cipher(self.aes_secret, iv, 0, ciphername=ciphername)
+
+        # Remplacer pyelliptic.Cipher par cryptography.Cipher
+        self.aes_enc = Cipher(
+            algorithms.AES(self.aes_secret),
+            modes.CTR(iv),
+            backend=default_backend()
+        ).encryptor()
+        self.aes_dec = Cipher(
+            algorithms.AES(self.aes_secret),
+            modes.CTR(iv),
+            backend=default_backend()
+        ).decryptor()
+
+        # Garder la configuration du MAC
         self.mac_enc = AES.new(self.mac_secret, AES.MODE_ECB).encrypt
 
         self.is_ready = True

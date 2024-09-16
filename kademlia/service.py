@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from gevent import Greenlet
-import utils
+from kademlia.utils import update_config_with_defaults
 
 
 class BaseService(Greenlet):
@@ -24,7 +24,7 @@ class BaseService(Greenlet):
         Greenlet.__init__(self)
         self.is_stopped = False
         self.app = app
-        self.config = utils.update_config_with_defaults(app.config, self.default_config)
+        self.config = update_config_with_defaults(app.config, self.default_config)
         available_service = [s.__class__ for s in self.app.services.values()]
         for r in self.required_services:
             assert r in available_service, (r, available_service)

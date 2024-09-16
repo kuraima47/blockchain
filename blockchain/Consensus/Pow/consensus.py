@@ -1,3 +1,8 @@
+import os
+import queue
+import random
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from queue import Queue
 
 import rlp
@@ -7,6 +12,9 @@ from blockchain.Consensus import *
 import time
 
 from blockchain.Consensus.Pow.dataset import Dataset
+from blockchain.Consensus.consensus import Engine, ChainHeaderReader, ChainReader
+from blockchain.block import Block, BlockHeader
+from blockchain.storage import Storage
 from kademlia.crypto import sha3, fvn, fvnHash
 
 params = {
@@ -38,10 +46,10 @@ class ProofOfWork(Engine):
         self.caches = LRUCache(params["epochLength"])
         self.datasets = LRUCache(params["epochLength"])
 
-    def author(self, header: BlockHeader) -> tuple:
+    def author(self, header) -> tuple:
         return header.beneficiary, None
 
-    def verify_header(self, chain: ChainHeaderReader, header: BlockHeader) -> bool:
+    def verify_header(self, chain, header) -> bool:
         number = header.number
         if chain.get_header(header.hash, number) is not None:
             return False
@@ -50,7 +58,7 @@ class ProofOfWork(Engine):
             return False
         return verifyHeader(chain, header, parent, False, int(time.time()))
 
-    def verify_headers(self, chain: ChainHeaderReader, headers: List[BlockHeader]) -> tuple:
+    def verify_headers(self, chain, headers) -> tuple:
         if self.fakeFull or len(headers) == 0:
             abort = Queue()
             results = Queue(maxsize=len(headers))
@@ -81,7 +89,7 @@ class ProofOfWork(Engine):
         threading.Thread(target=worker).start()
         return abort, results
 
-    def verify_uncles(self, chain: ChainReader, block: Block) -> bool:
+    def verify_uncles(self, chain, block) -> bool:
         if self.fakeFull:
             return True
         if len(block.uncles) > self.maxUncles:
@@ -122,18 +130,18 @@ class ProofOfWork(Engine):
                 return False
         return True
 
-    def prepare(self, chain: ChainReader, header: BlockHeader) -> bool:
+    def prepare(self, chain, header) -> bool:
         parent = chain.chainReaderHeader.get_header(header.parent_hash, header.number - 1)
         if parent is None:
             return False
         return True
 
-    def finalize(self, chain: ChainHeaderReader, header: BlockHeader, stateDB, txs: List[Transaction],
-                 uncles: List[BlockHeader], withdrawals: List) -> None:
+    def finalize(self, chain, header, stateDB, txs,
+                 uncles, withdrawals) -> None:
         accumulateRewards(chain.config(), stateDB, header, uncles)
 
-    def finalize_and_assemble(self, chain: ChainHeaderReader, header: BlockHeader, stateDB, txs: List[Transaction],
-                              uncles: List[BlockHeader], receipts: List, withdrawals: List) -> tuple:
+    def finalize_and_assemble(self, chain, header, stateDB, txs,
+                              uncles, receipts, withdrawals) -> tuple:
         if len(withdrawals) > 0:
             return None, False
 
@@ -141,7 +149,7 @@ class ProofOfWork(Engine):
         header.state_root = stateDB.root
         return Block(BlockHeader, txs), True
 
-    def seal(self, chain: ChainHeaderReader, block: Block, results: queue.Queue, stop: threading.Event) -> bool:
+    def seal(self, chain, block, results, stop) -> bool:
 
         abort = threading.event()
         with self.lock:
@@ -188,7 +196,7 @@ class ProofOfWork(Engine):
         executor.shutdown(wait=False)
         return True
 
-    def seal_hash(self, header: BlockHeader) -> str:
+    def seal_hash(self, header) -> str:
         enc = rlp.encode([
             header.parent_hash,
             header.uncle_hash,
@@ -206,16 +214,16 @@ class ProofOfWork(Engine):
         ])
         return sha3(enc)
 
-    def calc_difficulty(self, chain: ChainHeaderReader, time: int, parent: BlockHeader) -> int:
+    def calc_difficulty(self, chain, time, parent) -> int:
         return calcDifficulty(chain.config(), time, parent)
 
-    def apis(self, chain: ChainHeaderReader) -> List:
+    def apis(self, chain):
         return ["eth", "net", "web3", "miner", "admin"]
 
     def close(self) -> bool:
         return True
 
-    def mine(self, block: Block, id: int, seed: int, abort: threading.Event) -> tuple[Block, bytes]:
+    def mine(self, block, id, seed, abort) -> tuple[Block, bytes]:
         header = block.header
         hash = self.seal_hash(header)
         target = 2 ** 256 // header.difficulty
@@ -261,7 +269,7 @@ class ProofOfWork(Engine):
         return current.dataset
 
 
-def verifyHeader(chain: ChainHeaderReader, header: BlockHeader, parent: BlockHeader, uncle: bool, now: int) -> bool:
+def verifyHeader(chain, header: BlockHeader, parent: BlockHeader, uncle: bool, now: int) -> bool:
     if len(header.extra_data) > params["MaximumExtraDataSize"]:
         return False
 
@@ -373,3 +381,5 @@ def hashimoto(hash: bytes, nonce: int, size: int, lookup) -> tuple[bytes, bytes]
         digest[i * 4] = val.to_bytes(32, "little")
 
     return bytes(digest), sha3(seed + digest)
+
+

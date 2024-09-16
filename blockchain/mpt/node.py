@@ -98,4 +98,3 @@ class Node:
             return encoded_node
         else:
             return keccak_hash(encoded_node)
-

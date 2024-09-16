@@ -16,11 +16,9 @@ from kademlia.utils import decode_hex, str_to_bytes, compute_transactions_root, 
 from blockchain.block import Block, BlockHeader
 from blockchain.transaction import Transaction
 from blockchain.state import State
-from blockchain.storage import Storage
 from blockchain.miner import Miner
 from blockchain.Consensus.Pow.consensus import ProofOfWork
 from blockchain.Wallet.wallet import Wallet, create_wallet
-from blockchain.Wallet.utils.ethereum import PrivateKey
 
 # Importations supplémentaires
 import rlp
@@ -152,7 +150,8 @@ class BlockchainApp(BaseApp):
         self.state = State('global')
         self.chain = []
         self.txpool = []
-        self.storage = None
+        self.db_path = self.config.get('data_dir', './data')
+        self.current_root = self.config.get('state_root', None)
         self.consensus_engine = None
         self.wallet = None
         self.miner = None
@@ -178,17 +177,18 @@ class BlockchainApp(BaseApp):
 
     def setup(self):
         # Initialisation du stockage, état, consensus, portefeuille, mineur
-        self.storage = Storage(storage_root=self.config.get('data_dir', './data'))
-        self.state = State('global', storage_root=self.storage.current_root)
+
+        self.state = State('global', storage_root=self.current_root, db_path=self.db_path)
 
         # Initialiser les états des contrats et des adresses
-        self.contract_state = State('contract')
-        self.address_state = State('address')
+        self.contract_state = State('contract', db_path=self.state.db_path)
+        self.address_state = State('address', db_path=self.state.db_path)
+        self.chain_state = State('chain', db_path=self.state.db_path)
 
         # Mettre à jour le global_state avec les racines des états
         self.state.update('contract_state', self.contract_state.current_state_root())
         self.state.update('address_state', self.address_state.current_state_root())
-
+        self.state.update('chain_state', self.chain_state.current_state_root())
         self.consensus_engine = ProofOfWork()
         self.wallet = create_wallet()
         self.miner = Miner(
@@ -213,26 +213,30 @@ class BlockchainApp(BaseApp):
         else:
             genesis_block = self.create_genesis_block()
 
-        self.chain.append(genesis_block)
-
         # Récupérer les racines des états depuis le global_state
         contract_state_root = self.state.get('contract_state')
         address_state_root = self.state.get('address_state')
+        chain_state_root = self.state.get('chain_state')
 
         # Recréer les états des contrats et des adresses
-        self.contract_state = State('contract', storage_root=contract_state_root)
-        self.address_state = State('address', storage_root=address_state_root)
+        self.contract_state = State('contract', storage_root=contract_state_root, db_path=self.state.db_path)
+        self.address_state = State('address', storage_root=address_state_root, db_path=self.state.db_path)
+        self.chain_state = State('chain', storage_root=chain_state_root, db_path=self.state.db_path)
+
+        self.chain.append(genesis_block)
+        self.chain_state.update(genesis_block.hash, genesis_block.encode_block)
 
         log.info("Blockchain initialisée avec le bloc genesis.")
 
     def create_genesis_block(self) -> Block:
         # Initialiser les états des contrats et des adresses vides
-        contract_state = State('contract')
-        address_state = State('address')
-
+        self.contract_state = State('contract', db_path=self.state.db_path)
+        self.address_state = State('address', db_path=self.state.db_path)
+        self.chain_state = State('chain', db_path=self.state.db_path)
         # Mettre à jour le global_state avec les racines des états
-        self.state.update('contract_state', contract_state.current_state_root())
-        self.state.update('address_state', address_state.current_state_root())
+        self.state.update('contract_state', self.contract_state.current_state_root())
+        self.state.update('address_state', self.address_state.current_state_root())
+        self.state.update('chain_state', self.chain_state.current_state_root())
 
         genesis_header = BlockHeader(
             number=0,
@@ -260,14 +264,11 @@ class BlockchainApp(BaseApp):
     def add_block(self, block: Block) -> bool:
         # Ajouter un bloc à la chaîne après validation
         if self.validate_block(block):
-            self.chain.append(block)
             # Recréer les états des contrats et des adresses à partir du global_state
-            contract_state_root = self.state.get('contract_state')
-            address_state_root = self.state.get('address_state')
-            contract_state = State('contract', storage_root=contract_state_root)
-            address_state = State('address', storage_root=address_state_root)
-            self.state.update('contract_state', contract_state.current_state_root())
-            self.state.update('address_state', address_state.current_state_root())
+            self.chain_state = State('chain', storage_root=self.state.get('chain_state'), db_path=self.state.db_path)
+            self.chain.append(block)
+            self.chain_state.update(block.hash, block.encode_block)
+            self.state.update('chain_state', self.chain_state.current_state_root())
             log.info(f"Bloc #{block.header.number} ajouté à la blockchain.")
             return True
         else:
@@ -285,8 +286,13 @@ class BlockchainApp(BaseApp):
             if block.header.number != parent_block.header.number + 1:
                 log.error("Le numéro du bloc n'est pas séquentiel.")
                 return False
-            # Vérification de l'état en réexécutant les transactions si nécessaire
-            # Vous pouvez ajouter d'autres validations ici
+            # Valider les transactions
+            for tx in block.transactions:
+                if not tx.is_valid():
+                    log.error(f"Transaction invalide dans le bloc #{block.header.number}.")
+                    return False
+                else:
+                    self.miner.validate_and_apply_transaction(tx)
             return True
         except Exception as e:
             log.error(f"Erreur lors de la validation du bloc: {e}")

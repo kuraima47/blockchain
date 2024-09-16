@@ -1,4 +1,4 @@
-import slogging
+import kademlia.slogging as slogging
 from upnpy import UPnP
 
 log = slogging.get_logger("p2p.upnp")

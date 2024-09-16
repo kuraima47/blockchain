@@ -1,9 +1,9 @@
 import gevent
 import rlp
 from rlp import sedes
-from multiplexer import Packet
-from service import WiredService
-import slogging
+from kademlia.multiplexer import Packet
+from kademlia.service import WiredService
+import kademlia.slogging as slogging
 
 log = slogging.get_logger("protocol")
 

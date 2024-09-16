@@ -1,7 +1,7 @@
 from gevent.queue import Queue
 from collections import OrderedDict
 import rlp
-from utils import str_to_bytes, is_integer
+from kademlia.utils import str_to_bytes, is_integer
 import struct
 import sys
 

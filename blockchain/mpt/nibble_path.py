@@ -140,4 +140,3 @@ class NibblePath:
         """Merges two paths into one."""
         chained = NibblePath._Chained(self, other)
         return NibblePath._create_new(chained, len(chained))
-

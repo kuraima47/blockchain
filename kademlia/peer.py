@@ -3,16 +3,16 @@ import errno
 import gevent
 import operator
 from collections import OrderedDict
-from protocol import BaseProtocol
-from p2p_protocol import P2PProtocol
-from service import WiredService
-from multiplexer import MultiplexerError, Packet
-from muxsession import MultiplexedSession
-from crypto import ECIESDecryptionError
-import slogging
+from kademlia.protocol import BaseProtocol
+from kademlia.p2p_protocol import P2PProtocol
+from kademlia.service import WiredService
+from kademlia.multiplexer import MultiplexerError, Packet
+from kademlia.muxsession import MultiplexedSession
+from kademlia.crypto import ECIESDecryptionError
+import kademlia.slogging as slogging
 import gevent.socket
-import rlpxcipher
-from utils import decode_hex
+import kademlia.rlpxcipher as rlpxcipher
+from kademlia.utils import decode_hex
 
 log = slogging.get_logger("p2p.peer")
 

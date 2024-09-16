@@ -7,16 +7,16 @@ import gevent
 import gevent.socket
 import ipaddress
 import rlp
-from utils import decode_hex, is_integer, str_to_bytes, bytes_to_str, safe_ord
+from kademlia.utils import decode_hex, is_integer, str_to_bytes, bytes_to_str, safe_ord
 from gevent.server import DatagramServer
 
-import slogging
-import crypto
-import kademlia
-import utils
-from service import BaseService
-from upnp import add_portmap, remove_portmap
-from utils import get_local_ip
+import kademlia.slogging as slogging
+import kademlia.crypto as crypto
+import kademlia.kademlia as kademlia
+import kademlia.utils as utils
+from kademlia.service import BaseService
+from kademlia.upnp import add_portmap, remove_portmap
+from kademlia.utils import get_local_ip
 
 log = slogging.get_logger("p2p.discovery")
 

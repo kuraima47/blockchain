@@ -1,13 +1,11 @@
 import rlp
 from .storage import Storage
 from .handler import Service
-from blockchain.blockchain import app
 
 
-class State(Service):
+class State:
 
     def __init__(self, name, storage_root=None):
-        super().__init__(app)
         self.storage = Storage(storage_root)
         self.name = f"{self.__class__.__name__}_{name}"
 

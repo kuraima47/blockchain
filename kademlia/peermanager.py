@@ -5,16 +5,16 @@ import atexit
 import time
 from gevent.server import StreamServer
 from gevent.socket import create_connection
-from service import WiredService
-from p2p_protocol import P2PProtocol
-from upnp import add_portmap, remove_portmap
-import kademlia
-from peer import Peer
-import crypto
-import utils
-from utils import decode_hex, get_local_ip
+from kademlia.service import WiredService
+from kademlia.p2p_protocol import P2PProtocol
+from kademlia.upnp import add_portmap, remove_portmap
+import kademlia.kademlia as kademlia
+from kademlia.peer import Peer
+import kademlia.crypto as crypto
+import kademlia.utils as utils
+from kademlia.utils import decode_hex, get_local_ip
 
-import slogging
+import kademlia.slogging as slogging
 
 log = slogging.get_logger("p2p.peermgr")
 
