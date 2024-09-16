@@ -8,7 +8,6 @@ from blockchain.VM.code import Code
 from blockchain.block import Block, BlockHeader
 from blockchain.VM.VM import VM
 from blockchain.transaction import Transaction
-from kademlia.utils import compute_transactions_root, compute_receipts_root
 
 
 class Miner:
@@ -35,8 +34,8 @@ class Miner:
             gas_used=0,
             nonce='0' * 16,
             state_root=self.blockchain.state.current_state_root(),
-            transaction_root=compute_transactions_root(transactions),
-            receipts_root=compute_receipts_root([]),
+            transaction_root=self.blockchain.compute_transactions_root(transactions),
+            receipts_root=self.blockchain.compute_receipts_root([]),
             logs_bloom='',
             uncles_hash='',
             extra_data=''

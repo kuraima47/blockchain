@@ -1,3 +1,5 @@
+import rlp
+
 from .mpt.hash import keccak_hash
 from .mpt.mpt import MerklePatriciaTrie
 

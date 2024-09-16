@@ -5,13 +5,13 @@ import time
 import threading
 
 from app import BaseApp
+from blockchain.storage import Storage
 # Importations des modules nécessaires
 from kademlia.service import WiredService
 from kademlia.protocol import BaseProtocol
 from kademlia.peermanager import PeerManager
 from kademlia.discovery import NodeDiscovery
 from kademlia.slogging import get_logger
-from kademlia.utils import decode_hex, str_to_bytes, compute_transactions_root, compute_receipts_root
 
 from blockchain.block import Block, BlockHeader
 from blockchain.transaction import Transaction
@@ -178,17 +178,20 @@ class BlockchainApp(BaseApp):
     def setup(self):
         # Initialisation du stockage, état, consensus, portefeuille, mineur
 
-        self.state = State('global', storage_root=self.current_root, db_path=self.db_path)
+        self.state = State('global', storage_root=self.current_root)
 
         # Initialiser les états des contrats et des adresses
-        self.contract_state = State('contract', db_path=self.state.db_path)
-        self.address_state = State('address', db_path=self.state.db_path)
-        self.chain_state = State('chain', db_path=self.state.db_path)
+        self.contract_state = State('contract')
+        self.address_state = State('address')
+        self.chain_state = State('chain')
 
         # Mettre à jour le global_state avec les racines des états
-        self.state.update('contract_state', self.contract_state.current_state_root())
-        self.state.update('address_state', self.address_state.current_state_root())
-        self.state.update('chain_state', self.chain_state.current_state_root())
+        if not self.contract_state.current_state_root() is None:
+            self.state.update('contract_state', self.contract_state.current_state_root())
+        if not self.address_state.current_state_root() is None:
+            self.state.update('address_state', self.address_state.current_state_root())
+        if not self.chain_state.current_state_root() is None:
+            self.state.update('chain_state', self.chain_state.current_state_root())
         self.consensus_engine = ProofOfWork()
         self.wallet = create_wallet()
         self.miner = Miner(
@@ -219,9 +222,9 @@ class BlockchainApp(BaseApp):
         chain_state_root = self.state.get('chain_state')
 
         # Recréer les états des contrats et des adresses
-        self.contract_state = State('contract', storage_root=contract_state_root, db_path=self.state.db_path)
-        self.address_state = State('address', storage_root=address_state_root, db_path=self.state.db_path)
-        self.chain_state = State('chain', storage_root=chain_state_root, db_path=self.state.db_path)
+        self.contract_state = State('contract', storage_root=contract_state_root)
+        self.address_state = State('address', storage_root=address_state_root)
+        self.chain_state = State('chain', storage_root=chain_state_root)
 
         self.chain.append(genesis_block)
         self.chain_state.update(genesis_block.hash, genesis_block.encode_block)
@@ -230,9 +233,9 @@ class BlockchainApp(BaseApp):
 
     def create_genesis_block(self) -> Block:
         # Initialiser les états des contrats et des adresses vides
-        self.contract_state = State('contract', db_path=self.state.db_path)
-        self.address_state = State('address', db_path=self.state.db_path)
-        self.chain_state = State('chain', db_path=self.state.db_path)
+        self.contract_state = State('contract')
+        self.address_state = State('address')
+        self.chain_state = State('chain')
         # Mettre à jour le global_state avec les racines des états
         self.state.update('contract_state', self.contract_state.current_state_root())
         self.state.update('address_state', self.address_state.current_state_root())
@@ -265,7 +268,7 @@ class BlockchainApp(BaseApp):
         # Ajouter un bloc à la chaîne après validation
         if self.validate_block(block):
             # Recréer les états des contrats et des adresses à partir du global_state
-            self.chain_state = State('chain', storage_root=self.state.get('chain_state'), db_path=self.state.db_path)
+            self.chain_state = State('chain', storage_root=self.state.get('chain_state'))
             self.chain.append(block)
             self.chain_state.update(block.hash, block.encode_block)
             self.state.update('chain_state', self.chain_state.current_state_root())
@@ -341,6 +344,18 @@ class BlockchainApp(BaseApp):
             if isinstance(service, service_class):
                 return service
         return None
+
+    def compute_transactions_root(self, transactions):
+        thx_mpt = Storage(in_memory=True)
+        for tx in transactions:
+            thx_mpt[tx.hash] = rlp.encode
+        return thx_mpt.current_root
+
+    def compute_receipts_root(self, receipts):
+        receipts_mpt = Storage(in_memory=True)
+        for receipt in receipts:
+            receipts_mpt[receipt.transaction_hash] = rlp.encode(receipt)
+        return receipts_mpt.current_root
 
 
 # Exemple d'utilisation

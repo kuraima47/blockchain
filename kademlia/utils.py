@@ -11,8 +11,6 @@ from collections.abc import Mapping
 from eth_utils import *
 from hashlib import sha3_256
 
-from blockchain.storage import Storage
-
 
 def str_to_bytes(s):
     if isinstance(s, str):
@@ -316,19 +314,6 @@ def encode_function_call_no_args(function_name):
     function_selector = function_hash[:4]
     return function_selector
 
-
-def compute_transactions_root(transactions):
-    thx_mpt = Storage(in_memory=True)
-    for tx in transactions:
-        thx_mpt[tx.hash] = rlp.encode
-    return thx_mpt.current_root
-
-
-def compute_receipts_root(receipts):
-    receipts_mpt = Storage(in_memory=True)
-    for receipt in receipts:
-        receipts_mpt[receipt.transaction_hash] = rlp.encode(receipt)
-    return receipts_mpt.current_root
 
 # ###### colors ###############
 
